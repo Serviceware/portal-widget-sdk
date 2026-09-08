@@ -1,0 +1,39 @@
+{
+  "name": "@serviceware/portal-widget-sdk",
+  "version": "0.0.0",
+  "description": "Zero-dependency runtime for Serviceware Portal private widgets: toasts, settings dialog, navigation, skeleton, authenticated fetch, custom element helper.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./contract": {
+      "types": "./dist/contract.d.ts",
+      "import": "./dist/contract.js",
+      "require": "./dist/contract.cjs"
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsup src/index.ts src/contract.ts --format esm,cjs --dts --clean --target es2020",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "keywords": ["serviceware", "portal", "widget", "custom-element", "web-component"],
+  "publishConfig": { "access": "public", "provenance": true }
+}

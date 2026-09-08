@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://serviceware.example/schemas/widget-package-metadata.schema.json",
+  "title": "Private Widget Package Metadata (widget-metadata.json inside the import zip)",
+  "description": "Shape read by the Portal admin 'Add private widget' dialog when importing a zip. This is NOT the same shape as the repo-level widget-metadata.json (see widget-metadata.schema.json). Produced by `portal-widget pack`.",
+  "type": "object",
+  "required": ["tagName", "name", "description", "defaultSize", "angularVersion", "authenticated", "changes", "fileFullName", "fileLightName"],
+  "additionalProperties": false,
+  "properties": {
+    "tagName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "pattern": "^[a-z][a-z0-9._]*-[a-z0-9._-]*$",
+      "description": "Custom-element tag. Must match customElements.define() in the bundles."
+    },
+    "name": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/multilanguageValue" },
+      "description": "Display name per language. An 'en' entry is required by the Portal dialog. Max 100 characters each."
+    },
+    "description": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/multilanguageValue" },
+      "description": "HTML description per language. An 'en' entry is required. Max 4000 characters each."
+    },
+    "tags": {
+      "type": "array",
+      "maxItems": 10,
+      "items": { "type": "string", "minLength": 1, "maxLength": 100 }
+    },
+    "defaultSize": {
+      "type": "object",
+      "required": ["columns", "rows"],
+      "additionalProperties": false,
+      "properties": {
+        "columns": { "type": "integer", "minimum": 1 },
+        "rows": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "angularVersion": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "0 for non-Angular widgets. The Portal loads the light bundle only when this equals its own Angular major."
+    },
+    "authenticated": {
+      "type": "boolean",
+      "description": "true = only authenticated users may see the widget."
+    },
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/multilanguageValue" },
+      "description": "Customer-facing release notes per language (HTML). An 'en' entry is required."
+    },
+    "dependencies": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["name", "dependency"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "dependency": { "type": "string", "minLength": 1, "description": "Constraint, e.g. >=3.0.0" }
+        }
+      }
+    },
+    "fileFullName": {
+      "type": "string",
+      "pattern": "\\.js$",
+      "description": "Zip entry name of the full bundle. Convention: <tag>-<version>-full.js"
+    },
+    "fileLightName": {
+      "type": "string",
+      "pattern": "\\.js$",
+      "description": "Zip entry name of the light bundle. Convention: <tag>-<version>-light.js"
+    }
+  },
+  "definitions": {
+    "multilanguageValue": {
+      "type": "object",
+      "required": ["language", "value"],
+      "additionalProperties": false,
+      "properties": {
+        "language": { "type": "string", "minLength": 2, "description": "Language code, e.g. en, de, pt-BR" },
+        "value": { "type": "string" },
+        "nativeName": { "type": "string", "description": "Optional, ignored on import." }
+      }
+    }
+  }
+}

@@ -1,0 +1,193 @@
+/*
+ * Widget stylesheet. Keep every rule flat (no nested at-rules): build.mjs scopes each
+ * selector to `[serviceware-logo-three]` and wraps the file in `@layer widgets` for light mode.
+ * `:host` maps to the Portal's host wrapper in light mode and to the shadow host in shadow mode.
+ */
+:host {
+    height: 100%;
+}
+
+.sw3d-host {
+    display: block;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.sw3d-root {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    min-height: 240px;
+    box-sizing: border-box;
+    padding: 8px;
+    color: inherit;
+    font: inherit;
+}
+
+.sw3d-stage {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 140px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: radial-gradient(ellipse at 50% 40%, #f6f9fc 0%, #dfe7ef 70%, #cfd9e3 100%);
+    touch-action: none;
+    cursor: grab;
+}
+
+.sw3d-stage:active {
+    cursor: grabbing;
+}
+
+.sw3d-stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.sw3d-stage-fallback {
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    text-align: center;
+    color: #5b6b7a;
+}
+
+.sw3d-caption {
+    text-align: center;
+    font-weight: 600;
+    color: #003f72;
+}
+
+.sw3d-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sw3d-button {
+    padding: 4px 10px;
+    border: 1px solid #b9c6d2;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1f2933;
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.sw3d-button:hover {
+    border-color: #0082bb;
+    color: #0082bb;
+}
+
+.sw3d-button-primary {
+    border-color: #0082bb;
+    background: #0082bb;
+    color: #ffffff;
+}
+
+.sw3d-button-primary:hover {
+    background: #006c9b;
+    color: #ffffff;
+}
+
+.sw3d-panel {
+    font-size: 12px;
+    color: #4a5a68;
+}
+
+.sw3d-panel summary {
+    cursor: pointer;
+}
+
+.sw3d-panel dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 2px 12px;
+    margin: 6px 0 0;
+}
+
+.sw3d-panel dt {
+    font-weight: 600;
+}
+
+.sw3d-panel dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.sw3d-settings {
+    display: grid;
+    gap: 12px;
+    box-sizing: border-box;
+    padding: 8px;
+    font: inherit;
+}
+
+.sw3d-settings-title {
+    margin: 0;
+    font-size: 16px;
+    color: #003f72;
+}
+
+.sw3d-settings-intro {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7a88;
+}
+
+.sw3d-field {
+    display: grid;
+    gap: 4px;
+}
+
+.sw3d-field-inline {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
+}
+
+.sw3d-field-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.sw3d-input {
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #b9c6d2;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.sw3d-hint {
+    grid-column: 1 / -1;
+    font-size: 11px;
+    color: #6b7a88;
+}
+
+.sw3d-notice {
+    margin: 0;
+    padding: 12px;
+    color: #4a5a68;
+    font-size: 13px;
+}
+
+.sw3d-error {
+    margin: 0;
+    padding: 8px;
+    border-radius: 6px;
+    background: #fdecec;
+    color: #b00020;
+    font-size: 12px;
+}
+
+.sw3d-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

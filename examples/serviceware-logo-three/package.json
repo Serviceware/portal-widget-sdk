@@ -1,0 +1,27 @@
+{
+  "name": "@examples/serviceware-logo-three",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Example private widget: the Serviceware logo extruded in 3D with three.js, exercising every runtime feature of @serviceware/portal-widget-sdk.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && node build.mjs",
+    "build:shadow": "tsc --noEmit && node build.mjs --css-mode shadow",
+    "dev": "node build.mjs --watch --serve",
+    "pack:widget": "portal-widget pack",
+    "validate": "portal-widget validate portal-widget.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src dev build.mjs"
+  },
+  "devDependencies": {
+    "@serviceware/portal-widget-cli": "workspace:*",
+    "@serviceware/portal-widget-sdk": "workspace:*",
+    "@types/three": "^0.185.4",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}

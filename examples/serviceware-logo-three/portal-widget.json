@@ -1,0 +1,30 @@
+{
+    "template": "custom",
+    "tagName": "serviceware-logo-three",
+    "version": "1.0.0",
+    "name": [
+        { "language": "en", "value": "Serviceware Logo 3D" },
+        { "language": "de", "value": "Serviceware Logo 3D" }
+    ],
+    "description": [
+        {
+            "language": "en",
+            "value": "<p>The Serviceware logo rendered in 3D with three.js. Reference widget for the Portal Widget SDK: settings dialog, toasts, navigation, skeleton, translations and resize handling.</p>"
+        },
+        {
+            "language": "de",
+            "value": "<p>Das Serviceware-Logo in 3D mit three.js. Referenz-Widget für das Portal Widget SDK: Einstellungsdialog, Toasts, Navigation, Skeleton, Übersetzungen und Größenänderungen.</p>"
+        }
+    ],
+    "changes": [{ "language": "en", "value": "<p>Initial version.</p>" }],
+    "tags": ["Portal", "Demo"],
+    "defaultSize": { "columns": 4, "rows": 3 },
+    "angularVersion": 0,
+    "authenticated": false,
+    "dependencies": [{ "name": "Portal", "dependency": ">=3.0.0" }],
+    "custom": {
+        "fullBundlePath": "bundles/serviceware-logo-three-1.0.0-full.js",
+        "lightBundlePath": "bundles/serviceware-logo-three-1.0.0-light.js"
+    },
+    "languageFiles": ["translations/en.json", "translations/de.json"]
+}
