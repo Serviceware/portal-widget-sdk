@@ -9,11 +9,11 @@ repeating them. The complete worked example is
 
 ## 1. What you need
 
-- Node 20 or newer and pnpm 9 or newer.
+- Node 20 or newer and a package manager (npm, pnpm or yarn).
 - A Portal 3.x with the `private-widgets` feature flag enabled and an administrator account.
-- Until the packages are published: a clone of this repository. Run `pnpm install` and `pnpm build` at the
-  root; your widget can then depend on the workspace packages (`"@serviceware/portal-widget-sdk": "workspace:*"`
-  inside `examples/`) or on the built `packages/*/dist` folders via `file:` dependencies.
+- The two packages from npm: `@serviceware/portal-widget-sdk` (runtime, a regular dependency of your widget)
+  and `@serviceware/portal-widget-cli` (a dev dependency, or run ad hoc with `npx`). Inside this repository
+  the example depends on them as `workspace:*` instead; run `pnpm install` and `pnpm build` at the root first.
 
 ## 2. How a widget works, in one paragraph
 
@@ -41,7 +41,7 @@ Run the CLI wizard and choose the **custom** path. It asks for a display name an
 `portal-widget.json` with a derived tag and the paths where your bundles must land:
 
 ```bash
-node <repo>/packages/cli/dist/bin.js        # later: npx portal-widget
+npx @serviceware/portal-widget-cli          # or `npx portal-widget` once it is a dev dependency
 ? Widget type: custom
 ? Display name: My Widget
 -> portal-widget.json  (tagName ssp-my-widget, bundles/ssp-my-widget-1.0.0-{full,light}.js)
@@ -152,8 +152,8 @@ constants and the tag from `portal-widget.json`.
 
 ```bash
 node build.mjs
-node <repo>/packages/cli/dist/bin.js validate portal-widget.json
-node <repo>/packages/cli/dist/bin.js pack          # -> <tagName>.zip
+npx portal-widget validate portal-widget.json
+npx portal-widget pack                             # -> <tagName>.zip
 ```
 
 Import: Portal Administration, Configuration, Widgets tab (`admin/configuration?tab=4`), the **small arrow**

@@ -2,17 +2,25 @@
 
 Public, framework-agnostic toolkit for building **private widgets** for Serviceware Portal.
 
-> Status: **CLI ported from SSP_Portal and passing its tests; SDK runtime (Phase 1) implemented and unit-tested;
-> first example widget (`examples/serviceware-logo-three`) builds, packs and runs in a Portal-mock harness. Not yet
-> verified inside a live Portal.** Nothing is published yet. The npm scope is `@serviceware`. See
-> [docs/plan.md](docs/plan.md).
+> Status: **0.x.** The CLI is ported from SSP_Portal and passes its tests; the SDK runtime (Phase 1) is
+> implemented and unit-tested; the first example widget (`examples/serviceware-logo-three`) builds, packs and
+> runs in a Portal-mock harness. **Not yet verified inside a live Portal**; expect breaking changes before 1.0.
+> See [docs/plan.md](docs/plan.md).
 
-## What this repo will ship
+## Packages
+
+```bash
+npm install @serviceware/portal-widget-sdk          # runtime, in your widget project
+npx @serviceware/portal-widget-cli                  # wizard, pack, validate, unpack
+```
 
 | Package | Purpose | Runs in |
 |---|---|---|
-| `packages/sdk` | Tiny, zero-dependency runtime: talk to the Portal (toasts, config modal, navigation, skeleton, resize), read the element inputs the Portal sets, authenticated fetch against the Portal API. | Browser |
-| `packages/cli` | `portal-widget` command line, ported from SSP_Portal: no-code **embed** wizard (name + URL in, import ZIP out), `pack` (embed, or your own bundles built with any framework), `validate`, `unpack`. Framework-agnostic `init`/`build` are still design only (`docs/cli.md`). | Node ≥ 20 |
+| [`@serviceware/portal-widget-sdk`](packages/sdk) | Tiny, zero-dependency runtime: talk to the Portal (toasts, config modal, navigation, skeleton, resize), read the element inputs the Portal sets, authenticated fetch against the Portal API. | Browser |
+| [`@serviceware/portal-widget-cli`](packages/cli) | `portal-widget` command line, ported from SSP_Portal: no-code **embed** wizard (name + URL in, import ZIP out), `pack` (embed, or your own bundles built with any framework), `validate`, `unpack`. Framework-agnostic `init`/`build` are still design only (`docs/cli.md`). | Node ≥ 20 |
+
+Both are released from this repository with [changesets](.changeset) and published with npm provenance
+by `.github/workflows/release.yml`.
 
 Widgets built with this SDK are uploaded through **Portal Admin → Widgets → Add private widget**, either
 field by field or by importing the zip the CLI produces.
@@ -54,8 +62,7 @@ field by field or by importing the zip the CLI produces.
 
 `reference/ssp-portal/` holds two verbatim Portal source snapshots that the CLI's `rules-drift.spec.ts`
 reads to detect when a mirrored upload limit changes. Every other Portal source is referenced by path in
-[docs/reference-sources.md](docs/reference-sources.md). Review whether the two files may stay before the
-repository goes public.
+[docs/reference-sources.md](docs/reference-sources.md).
 
 ## Repo layout
 
@@ -66,16 +73,20 @@ portal-widget-sdk/
   packages/sdk/         runtime package (browser, zero deps)
   packages/cli/         command line package (node)
   examples/             end-to-end example widgets (serviceware-logo-three: three.js, exercises the whole SDK)
-  reference/ssp-portal/ two Portal source snapshots read by the CLI drift spec (review before publishing)
+  reference/ssp-portal/ two Portal source snapshots read by the CLI drift spec
 ```
 
 ## Development
 
 ```bash
 pnpm install
-pnpm -r build
-pnpm -r test
+pnpm build            # packages/*
+pnpm test
+pnpm build:examples   # needs the package dists from the previous step
 ```
+
+Releases: every user-facing change adds a changeset (`pnpm changeset`). On push to `main` the release
+workflow opens or updates a "Version Packages" pull request; merging it publishes the bumped packages to npm.
 
 Tooling decisions (TypeScript, tsup, vitest, changesets, npm provenance) are described in
 [docs/plan.md](docs/plan.md).

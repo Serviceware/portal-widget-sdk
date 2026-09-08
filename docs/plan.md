@@ -19,8 +19,10 @@
 
 ## Open decisions (owner: Portal team)
 
-1. ~~npm scope~~ **Confirmed: `@serviceware`.** Still open: the GitHub organisation that hosts the public
-   repository, and who administers the npm organisation for trusted publishing (release.yml).
+1. ~~npm scope~~ **Confirmed: `@serviceware`.** ~~GitHub organisation~~ **Confirmed:
+   `github.com/Serviceware/portal-widget-sdk`.** Still open: who administers the npm organisation. The first
+   publish needs an `NPM_TOKEN` secret with publish rights on the scope; npm trusted publishing (OIDC) can
+   only be switched on per package after it exists on the registry (release.yml supports both).
 2. ~~Service connection proxy exists?~~ **Answered: no usable proxy** (backend-findings.md §1). Decide
    whether to build the proxy (§4) before or after SDK v1. SDK v1 ships without Tier 1 either way.
 3. ~~Header values returned to the browser?~~ **Answered: yes, to anonymous visitors**
@@ -46,8 +48,8 @@
 
 ### Phase 0 — repo bootstrap (this folder)
 - [x] folder, `git init`, docs, schemas, reference snapshots, workspace skeleton
-- [ ] `pnpm install`, tsup/vitest/eslint config, CI workflow running lint/test/build on PRs
-- [ ] confirm scope name, rename packages if needed
+- [x] `pnpm install`, tsup/vitest/eslint config, CI workflow running lint/test/build on PRs
+- [x] confirm scope name, rename packages if needed
 
 ### Phase 1 — sdk
 - [x] `src/contract.ts` constants + `src/types.ts`
@@ -78,7 +80,9 @@
       and shadow CSS builds, Portal-mock dev harness with a copy of the compliance probe
 - [ ] manual run: build → pack → import in Portal admin on localhost:4200 → toast + config modal work,
       no `[Widget Compliance]` warning, Portal styles unchanged
-- [ ] publish `0.1.0` of both packages (after scope confirmation)
+- [ ] publish `0.1.0` of both packages: merge the "Version Packages" PR that release.yml opens once
+      `NPM_TOKEN` is configured. Both tarballs were install-tested from `pnpm pack` output (CJS, ESM,
+      `/contract` subpath, `portal-widget` bin) and pass publint and arethetypeswrong.
 
 ### Phase 4 — Portal side
 - [ ] contract drift spec PR in SSP_Portal

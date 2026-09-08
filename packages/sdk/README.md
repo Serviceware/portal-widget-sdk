@@ -2,10 +2,22 @@
 
 Zero-dependency runtime for building Serviceware Portal **private widgets** with any framework.
 
-> Not published yet. The runtime from [`docs/sdk.md`](../../docs/sdk.md) is implemented and covered by
-> jsdom specs; it has not been verified inside a live Portal yet. Contract:
-> [`docs/contract.md`](../../docs/contract.md). Working example:
-> [`examples/serviceware-logo-three`](../../examples/serviceware-logo-three/).
+```bash
+npm install @serviceware/portal-widget-sdk
+```
+
+ESM and CommonJS builds with type declarations. Browser only, no framework imports, works with vanilla TS,
+React, Vue, Lit, Svelte or Angular.
+
+> **Status: 0.x.** The runtime specified in
+> [`docs/sdk.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/sdk.md) is implemented and
+> covered by jsdom specs that assert the exact event names and payload shapes of the Portal contract. It has
+> not yet been verified inside a live Portal; expect breaking changes before 1.0. Contract:
+> [`docs/contract.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/contract.md).
+> Walkthrough:
+> [`docs/getting-started.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/getting-started.md).
+> Working example:
+> [`examples/serviceware-logo-three`](https://github.com/Serviceware/portal-widget-sdk/tree/main/examples/serviceware-logo-three).
 
 ## Usage
 
@@ -42,7 +54,8 @@ credential.** This is a Portal limitation, not something the SDK can work around
 - The Portal's Service Connections store credentials server-side, but the Portal has **no proxy** that
   injects them into widget requests, and today it even returns the stored header values to anonymous
   visitors through its configuration endpoints (see
-  [`docs/backend-findings.md`](../../docs/backend-findings.md) sections 1 and 2).
+  [`docs/backend-findings.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/backend-findings.md)
+  sections 1 and 2).
 - Therefore the SDK ships **no** `createServiceClient` and no helper for API keys. It will be added when
   the Portal provides the server-side proxy.
 
@@ -64,4 +77,9 @@ The `secret: true` schema flag exists so you cannot persist a key into `customCo
 - `authToken` is the user's Portal session. The SDK only ever sends it to the Portal API.
 - Never forward `authToken` to any origin other than the Portal API.
 - Private API keys do not belong in the widget at all until the Portal proxy exists (section above). See
-  [`docs/security.md`](../../docs/security.md).
+  [`docs/security.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/security.md).
+
+## License
+
+MIT. Source, issues and the full documentation:
+[github.com/Serviceware/portal-widget-sdk](https://github.com/Serviceware/portal-widget-sdk).

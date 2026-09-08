@@ -5,13 +5,19 @@ private widget ZIP, and recovers the config back out of any ZIP, including one t
 One command, one ZIP. Runtime dependency: `fflate`. Nothing from the Portal monorepo, no private packages,
 no internal feed.
 
+```bash
+npx @serviceware/portal-widget-cli            # run the wizard without installing
+npm install --save-dev @serviceware/portal-widget-cli   # or add it to a widget project: npx portal-widget ...
+```
+
+Node 20 or newer. The package name, the bin name, the config file name and the ZIP sidecar name are held in
+exactly one module: `src/lib/package-identity.ts`.
+
 Ported from the SSP_Portal monorepo (`libs/create-widget`, branch `feature/private-widget-toolkit`). The
 file-by-file map, what stayed behind and the open decisions are in
-[`docs/cli-port-from-ssp-portal.md`](../../docs/cli-port-from-ssp-portal.md); the original author's
-handover with every trap is [`docs/handover-private-widget-toolkit.md`](../../docs/handover-private-widget-toolkit.md).
-
-> **Not published yet.** The npm scope is `@serviceware`. The package name, the bin name, the config file
-> name and the ZIP sidecar name are held in exactly one module: `src/lib/package-identity.ts`.
+[`docs/cli-port-from-ssp-portal.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/cli-port-from-ssp-portal.md);
+the original author's handover with every trap is
+[`docs/handover-private-widget-toolkit.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/handover-private-widget-toolkit.md).
 
 ## Commands
 
@@ -30,19 +36,16 @@ the Portal. `src/lib/output.ts`'s `nextAction` is the one place every closing me
 `pack`, a clean `validate` on a ZIP, and the wizard's embed path all close by naming
 `admin/configuration?tab=4`, the Portal's split-button Import entry that reads the produced ZIP.
 
-## Running it before it is published
+## Running it from a repository checkout
 
 ```bash
 pnpm install          # at the repository root
-pnpm build            # in packages/cli -> dist/bin.js, dist/index.js
-node dist/bin.js --help
+pnpm build            # builds packages/cli -> dist/bin.js, dist/index.js
+node packages/cli/dist/bin.js --help
 ```
 
-Rebuild after every change: `dist/` is what runs, not `src/`. For a short name in PowerShell:
-
-```powershell
-function portal-widget { node C:\GitSources\portal-widget-sdk\packages\cli\dist\bin.js $args }
-```
+Rebuild after every change: `dist/` is what runs, not `src/`. Inside the workspace, `examples/*` reach the
+CLI as `portal-widget` through their `workspace:*` dev dependency.
 
 ## Two paths
 
@@ -75,7 +78,8 @@ portal-widget
 
 The wizard stops at the config. You build the two bundle files with whatever toolchain you like, then run
 `portal-widget pack`. What a bundle must do is the Portal contract in
-[`docs/contract.md`](../../docs/contract.md) and the runtime helpers in [`docs/sdk.md`](../../docs/sdk.md):
+[`docs/contract.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/contract.md) and the
+runtime helpers in [`docs/sdk.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/sdk.md):
 a single classic script that calls `customElements.define('<tagName>', ...)` for the tag in the config,
 reads the properties the Portal sets on the element, and honours the CSS-isolation rules. Both `full` and
 `light` are required by the upload form; for a non-Angular widget they are the same file and the Portal
@@ -249,3 +253,8 @@ our code agrees with itself). It belongs in SSP_Portal; see `docs/plan.md`, Phas
 `fflate` only. The CLI surface uses Node built-ins (`node:util` `parseArgs`, `node:readline/promises`,
 `node:fs`, `node:path`). No Angular, no RxJS, nothing from the Portal or any private registry reaches the
 shipped runtime, the build, or the tests.
+
+## License
+
+MIT. Source, issues and the full documentation:
+[github.com/Serviceware/portal-widget-sdk](https://github.com/Serviceware/portal-widget-sdk).

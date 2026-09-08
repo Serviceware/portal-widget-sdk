@@ -3,6 +3,13 @@
   "version": "0.0.0",
   "description": "Command line for Serviceware Portal private widgets: embed wizard, pack the import zip (embed or your own bundles), validate, unpack.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Serviceware/portal-widget-sdk.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/Serviceware/portal-widget-sdk/tree/main/packages/cli#readme",
+  "bugs": { "url": "https://github.com/Serviceware/portal-widget-sdk/issues" },
   "type": "module",
   "bin": { "portal-widget": "./dist/bin.js" },
   "main": "./dist/index.js",

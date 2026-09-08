@@ -6,7 +6,6 @@ export default defineConfig({
     target: 'node20',
     platform: 'node',
     dts: { entry: { index: 'src/index.ts' } },
-    sourcemap: true,
     clean: true,
     splitting: true
 });

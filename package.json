@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "description": "Public SDK and CLI for building Serviceware Portal private widgets",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Serviceware/portal-widget-sdk.git"
+  },
   "engines": {
     "node": ">=20",
     "pnpm": ">=9"
