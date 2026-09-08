@@ -52,8 +52,10 @@ field by field or by importing the zip the CLI produces.
 10. [docs/handover-private-widget-toolkit.md](docs/handover-private-widget-toolkit.md) - the original
     author's handover: decisions already made and the traps that cost real time.
 
-`reference/ssp-portal/` holds verbatim snapshots of the Portal build scripts that the CLI ports. They are
-internal reference material; review and remove before this repository goes public.
+`reference/ssp-portal/` holds two verbatim Portal source snapshots that the CLI's `rules-drift.spec.ts`
+reads to detect when a mirrored upload limit changes. Every other Portal source is referenced by path in
+[docs/reference-sources.md](docs/reference-sources.md). Review whether the two files may stay before the
+repository goes public.
 
 ## Repo layout
 
@@ -64,7 +66,7 @@ portal-widget-sdk/
   packages/sdk/         runtime package (browser, zero deps)
   packages/cli/         command line package (node)
   examples/             end-to-end example widgets (serviceware-logo-three: three.js, exercises the whole SDK)
-  reference/ssp-portal/ snapshots of Portal tooling being ported (internal, remove before publishing)
+  reference/ssp-portal/ two Portal source snapshots read by the CLI drift spec (review before publishing)
 ```
 
 ## Development

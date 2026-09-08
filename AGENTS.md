@@ -24,4 +24,6 @@
 - Tests with vitest. SDK tests run in jsdom and assert exact event names and payload shapes from the
   contract.
 - Versioning with changesets. Every user-facing change gets a changeset.
-- Keep `reference/ssp-portal/` read-only. It is a snapshot for porting, not a dependency.
+- Keep `reference/ssp-portal/` read-only. It holds only the two Portal source snapshots that
+  `packages/cli/src/lib/rules-drift.spec.ts` reads; refresh them from a Portal checkout, never edit them.
+  Do not add more snapshots: point at Portal paths in `docs/reference-sources.md` instead.

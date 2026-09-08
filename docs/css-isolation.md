@@ -49,8 +49,9 @@ and for widgets that rely on body-portaled overlays.
 
 ## 3. What the CLI does to CSS (both modes)
 
-Ported from the Portal's `postcss-widget-scope-plugin.js` (see `reference/ssp-portal/`), dependency
-footprint: `postcss` only.
+To be ported from the Portal's `libs/utils/src/shared/postcss-widget-scope-plugin.js` (SSP_Portal, branch
+`portal30`), dependency footprint: `postcss` only. Until then the example's `build.mjs` implements the
+light-mode subset for a flat stylesheet.
 
 1. **Collect** all CSS produced by the bundler (imports of `.css`, framework-extracted styles, `styles.css`
    entry) into one stylesheet.

@@ -102,5 +102,5 @@ portal-widget-sdk/
   packages/sdk/              src/{index,contract,types,events,element,fetch,config}.ts, test/
   packages/cli/              src/{index,commands/*,css/*,secret-scan}.ts, templates/, test/fixtures/
   examples/vanilla-ts/
-  reference/ssp-portal/      internal snapshots — delete before making the repo public
+  reference/ssp-portal/      two Portal source snapshots read by the CLI drift spec (review before public)
 ```

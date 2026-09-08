@@ -70,7 +70,8 @@ Runs automatically inside `pack`; can be run alone.
 
 ## `portal-widget release` (alias `bump`)
 
-Port of the Portal's `prepare-widget-release` tool (see `reference/ssp-portal/prepare-widget-release.ts`).
+Port of the Portal's `prepare-widget-release` tool (SSP_Portal
+`libs/utils/src/shared/tools/prepare-widget-release.ts`, branch `portal30`).
 
 - Interactive: bump type (major/minor/patch/custom), technical changelog entries (Keep a Changelog
   categories) into `CHANGELOG.md`, customer-facing `changes` per language into the metadata (plain text
