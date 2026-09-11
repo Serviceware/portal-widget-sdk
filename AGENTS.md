@@ -24,6 +24,10 @@
 - Tests with vitest. SDK tests run in jsdom and assert exact event names and payload shapes from the
   contract.
 - Versioning with changesets. Every user-facing change gets a changeset.
+- `examples/*` are **not** in the root pnpm workspace. Each example is its own pnpm project
+  (`pnpm-workspace.yaml` with `packages: [.]`, `link:../../packages/*` dependencies, own lockfile) so the
+  root install never pulls framework dependencies. Use `pnpm install:examples` / `pnpm build:examples` /
+  `pnpm lint:examples` at the root, or work inside one example folder. Do not add `workspace:*` there.
 - Keep `reference/ssp-portal/` read-only. It holds only the two Portal source snapshots that
   `packages/cli/src/lib/rules-drift.spec.ts` reads; refresh them from a Portal checkout, never edit them.
   Do not add more snapshots: point at Portal paths in `docs/reference-sources.md` instead.

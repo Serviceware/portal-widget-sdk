@@ -1,0 +1,59 @@
+---
+/**
+ * What the Portal's settings dialog shows for this widget: a static notice that there is nothing to
+ * configure, plus a Close button the runtime wires to `ctx.cancel()`.
+ */
+import content from '../../data/content.json';
+import Card from '../../layouts/Card.astro';
+
+export function getStaticPaths() {
+    return Object.keys(content).map(lang => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as keyof typeof content;
+const texts = content[lang];
+---
+
+<Card lang={lang} title={texts.settingsTitle} footer={texts.footer}>
+    <h2 class="title">{texts.settingsTitle}</h2>
+    <p class="text">{texts.settingsText}</p>
+    <div class="actions">
+        <button type="button" class="button" data-action="cancel">{texts.close}</button>
+    </div>
+</Card>
+
+<style>
+    .title {
+        margin: 0;
+        font-size: 16px;
+        color: #003f72;
+    }
+
+    .text {
+        margin: 0;
+        font-size: 13px;
+        color: #4a5a68;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .button {
+        padding: 4px 10px;
+        border: 1px solid #b9c6d2;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #1f2933;
+        font: inherit;
+        font-size: 12px;
+        line-height: 1.4;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        border-color: #0082bb;
+        color: #0082bb;
+    }
+</style>

@@ -13,7 +13,8 @@ repeating them. The complete worked example is
 - A Portal 3.x with the `private-widgets` feature flag enabled and an administrator account.
 - The two packages from npm: `@serviceware/portal-widget-sdk` (runtime, a regular dependency of your widget)
   and `@serviceware/portal-widget-cli` (a dev dependency, or run ad hoc with `npx`). Inside this repository
-  the example depends on them as `workspace:*` instead; run `pnpm install` and `pnpm build` at the root first.
+  the examples link to the local packages (`link:../../packages/*`) and each is its own pnpm project: run
+  `pnpm install` and `pnpm build` at the root first, then `pnpm install` inside the example folder.
 
 ## 2. How a widget works, in one paragraph
 

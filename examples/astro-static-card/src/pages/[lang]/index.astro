@@ -1,0 +1,68 @@
+---
+/**
+ * The widget face, one page per language. build.mjs stores the rendered <body> of each language
+ * under dist-astro/<lang>/index.html and the runtime picks the variant matching the Portal's
+ * `language` input.
+ */
+import LinkList from '../../components/LinkList.astro';
+import content from '../../data/content.json';
+import Card from '../../layouts/Card.astro';
+
+export function getStaticPaths() {
+    return Object.keys(content).map(lang => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as keyof typeof content;
+const texts = content[lang];
+---
+
+<Card lang={lang} title={texts.title} footer={texts.footer}>
+    <div class="head">
+        <h2 class="title">{texts.title}</h2>
+        <button type="button" class="settings" data-action="settings" hidden>{texts.settings}</button>
+    </div>
+    <p class="intro">{texts.intro}</p>
+    <LinkList links={texts.links} />
+</Card>
+
+<style>
+    .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .title {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #003f72;
+    }
+
+    .intro {
+        margin: 0;
+        font-size: 12px;
+        color: #4a5a68;
+    }
+
+    .settings {
+        padding: 3px 10px;
+        border: 1px solid #0082bb;
+        border-radius: 6px;
+        background: #0082bb;
+        color: #ffffff;
+        font: inherit;
+        font-size: 12px;
+        line-height: 1.4;
+        cursor: pointer;
+    }
+
+    .settings:hover {
+        background: #006c9b;
+    }
+
+    .settings[hidden] {
+        display: none;
+    }
+</style>

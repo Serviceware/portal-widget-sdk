@@ -1,0 +1,29 @@
+{
+    "template": "custom",
+    "tagName": "react-live-counter",
+    "version": "1.0.0",
+    "name": [
+        { "language": "en", "value": "React Live Counter" },
+        { "language": "de", "value": "React Live Counter" }
+    ],
+    "description": [
+        {
+            "language": "en",
+            "value": "<p>A self-updating counter with a live clock, built with React 19 and TypeScript on the Portal Widget SDK. Shows how a React app mounts into the widget element, re-renders on Portal input changes and edits its settings in the Portal settings dialog.</p>"
+        },
+        {
+            "language": "de",
+            "value": "<p>Ein sich selbst aktualisierender Zähler mit Uhr, gebaut mit React 19 und TypeScript auf dem Portal Widget SDK. Zeigt, wie eine React-App im Widget-Element gemountet wird, auf Änderungen der Portal-Eingaben reagiert und ihre Einstellungen im Portal-Einstellungsdialog bearbeitet.</p>"
+        }
+    ],
+    "changes": [{ "language": "en", "value": "<p>Initial version.</p>" }],
+    "tags": ["Portal", "Demo", "React"],
+    "defaultSize": { "columns": 3, "rows": 2 },
+    "angularVersion": 0,
+    "authenticated": false,
+    "dependencies": [{ "name": "Portal", "dependency": ">=3.0.0" }],
+    "custom": {
+        "fullBundlePath": "bundles/react-live-counter-1.0.0-full.js",
+        "lightBundlePath": "bundles/react-live-counter-1.0.0-light.js"
+    }
+}

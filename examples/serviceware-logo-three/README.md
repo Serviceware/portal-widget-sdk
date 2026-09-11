@@ -32,6 +32,7 @@ name only; their header values must never be rendered or logged.
 pnpm install          # repository root
 pnpm build            # builds packages/sdk and packages/cli (the example needs both dists)
 cd examples/serviceware-logo-three
+pnpm install          # this folder is its own pnpm project, linked to ../../packages/*
 pnpm dev              # rebuilds on change and serves http://localhost:4201
 ```
 

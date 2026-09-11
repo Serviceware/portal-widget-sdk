@@ -6,6 +6,7 @@ on:
     branches: [main]
 
 jobs:
+  # The packages on the oldest Node they support (.nvmrc).
   verify:
     runs-on: ubuntu-latest
     steps:
@@ -20,6 +21,23 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      # Examples consume the built package dists, so they come after `pnpm build`.
+
+  # The examples are standalone pnpm projects linking ../../packages/*, so they need the built package
+  # dists and their own install. They run on a newer Node because Astro requires >= 22.12.
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            examples/*/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
       - run: pnpm lint:examples
+      - run: node scripts/examples.mjs install --frozen-lockfile
       - run: pnpm build:examples

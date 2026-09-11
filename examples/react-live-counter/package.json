@@ -1,9 +1,9 @@
 {
-  "name": "@examples/serviceware-logo-three",
+  "name": "@examples/react-live-counter",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "version": "1.0.0",
-  "description": "Example private widget: the Serviceware logo extruded in 3D with three.js, exercising every runtime feature of @serviceware/portal-widget-sdk.",
+  "description": "Example private widget built with React 19 and TypeScript: a live, self-updating counter with a React settings form, driven by @serviceware/portal-widget-sdk.",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -14,14 +14,16 @@
     "validate": "portal-widget validate portal-widget.json",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
   "devDependencies": {
     "@serviceware/portal-widget-cli": "link:../../packages/cli",
     "@serviceware/portal-widget-sdk": "link:../../packages/sdk",
-    "@types/three": "^0.185.4",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "esbuild": "^0.28.2",
     "typescript": "^5.6.0"
-  },
-  "dependencies": {
-    "three": "^0.185.1"
   }
 }

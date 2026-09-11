@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Portal harness: react-live-counter</title>
+        <style>
+            /* Same layer order as the Portal shell; the harness's own CSS lives in portal-base like Portal CSS does. */
+            @layer codeblue-legacy, codeblue3, portal-base, primeng, portal-overrides, widgets, app-overrides;
+
+            @layer portal-base {
+                * {
+                    box-sizing: border-box;
+                }
+                body {
+                    margin: 0;
+                    font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif;
+                    color: #1f2933;
+                    background: #eef2f6;
+                }
+                button,
+                select,
+                input {
+                    font: inherit;
+                }
+                header {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    gap: 10px 16px;
+                    padding: 10px 16px;
+                    background: #003f72;
+                    color: #fff;
+                }
+                header h1 {
+                    margin: 0 8px 0 0;
+                    font-size: 15px;
+                    font-weight: 600;
+                }
+                header label {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 12px;
+                }
+                header button {
+                    padding: 3px 8px;
+                    border: 1px solid rgba(255, 255, 255, 0.5);
+                    border-radius: 4px;
+                    background: transparent;
+                    color: #fff;
+                    font-size: 12px;
+                    cursor: pointer;
+                }
+                header button:hover {
+                    background: rgba(255, 255, 255, 0.12);
+                }
+                main {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) 380px;
+                    gap: 16px;
+                    padding: 16px;
+                }
+                .tile {
+                    position: relative;
+                    width: 460px;
+                    height: 300px;
+                    max-width: 100%;
+                    min-width: 240px;
+                    min-height: 200px;
+                    overflow: hidden;
+                    resize: both;
+                    border: 1px solid #cfd8e3;
+                    border-radius: 12px;
+                    background: #fff;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+                }
+                .tile-hint {
+                    margin: 6px 0 0;
+                    font-size: 12px;
+                    color: #6b7a88;
+                }
+                ssp-portal-widget {
+                    display: block;
+                    height: 100%;
+                }
+                .tile.skeleton::after {
+                    content: 'skeleton';
+                    position: absolute;
+                    inset: 0;
+                    display: grid;
+                    place-items: center;
+                    background: repeating-linear-gradient(90deg, #e3e9ef 0 40px, #eef2f6 40px 80px);
+                    color: #6b7a88;
+                    font-size: 12px;
+                    letter-spacing: 0.1em;
+                    text-transform: uppercase;
+                }
+                aside h2 {
+                    margin: 0 0 8px;
+                    font-size: 13px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    color: #6b7a88;
+                }
+                #log {
+                    height: calc(100vh - 140px);
+                    margin: 0;
+                    padding: 0;
+                    overflow: auto;
+                    list-style: none;
+                    font: 12px/1.45 ui-monospace, Consolas, monospace;
+                }
+                #log li {
+                    padding: 6px 8px;
+                    border-bottom: 1px solid #dfe6ee;
+                    white-space: pre-wrap;
+                    overflow-wrap: anywhere;
+                }
+                #log li b {
+                    color: #0082bb;
+                }
+                #log li.error b {
+                    color: #b00020;
+                }
+                #toasts {
+                    position: fixed;
+                    top: 12px;
+                    right: 12px;
+                    display: grid;
+                    gap: 8px;
+                    width: 320px;
+                    z-index: 10;
+                }
+                .toast {
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    gap: 2px 8px;
+                    padding: 10px 12px;
+                    border-left: 4px solid #0082bb;
+                    border-radius: 6px;
+                    background: #fff;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+                    font-size: 13px;
+                }
+                .toast.success {
+                    border-color: #2e8b57;
+                }
+                .toast.warn {
+                    border-color: #ff8300;
+                }
+                .toast.error {
+                    border-color: #b00020;
+                }
+                .toast strong {
+                    grid-column: 1;
+                }
+                .toast span {
+                    grid-column: 1;
+                }
+                .toast button {
+                    grid-row: 1 / span 2;
+                    align-self: start;
+                    border: 0;
+                    background: transparent;
+                    cursor: pointer;
+                }
+                dialog {
+                    width: 480px;
+                    max-width: calc(100vw - 32px);
+                    padding: 0;
+                    border: 0;
+                    border-radius: 12px;
+                    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+                }
+                dialog::backdrop {
+                    background: rgba(0, 20, 40, 0.45);
+                }
+                dialog .dialog-title {
+                    padding: 12px 16px;
+                    border-bottom: 1px solid #dfe6ee;
+                    font-weight: 600;
+                }
+                dialog .dialog-body {
+                    padding: 8px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Portal harness</h1>
+            <label>language <select id="language"><option value="en">en</option><option value="de-DE">de-DE</option><option value="fr">fr (falls back to en)</option></select></label>
+            <label>layout <select id="layout"><option>desktop</option><option>tablet</option><option>mobile</option></select></label>
+            <label><input type="checkbox" id="admin" checked /> admin mode</label>
+            <label><input type="checkbox" id="edition" /> edition mode</label>
+            <label><input type="checkbox" id="hidden" /> hidden</label>
+            <button id="resize" type="button">dispatch resize</button>
+            <button id="reconfig" type="button">re-set configuration</button>
+            <button id="token" type="button">renew token</button>
+            <button id="reattach" type="button">detach / re-attach</button>
+            <button id="probe" type="button">compliance probe</button>
+        </header>
+        <main>
+            <section>
+                <div class="tile" id="tile"></div>
+                <p class="tile-hint">Drag the tile's bottom-right corner to resize it; the harness dispatches the Portal resize event.</p>
+            </section>
+            <aside>
+                <h2>Events (widget to Portal)</h2>
+                <ul id="log"></ul>
+            </aside>
+        </main>
+        <div id="toasts"></div>
+        <dialog id="dialog">
+            <div class="dialog-title">Widget settings (Portal dialog mock)</div>
+            <div class="dialog-body" id="dialog-body"></div>
+        </dialog>
+        <script type="module" src="./harness.js"></script>
+    </body>
+</html>

@@ -1,0 +1,57 @@
+---
+/**
+ * Shared frame for every pre-rendered page. Astro emits a full document; build.mjs keeps only the
+ * <body> children and the <style> blocks, so <head> content never reaches the Portal.
+ *
+ * Keep every rule flat (no at-rules): build.mjs prefixes each selector with `[astro-static-card]`
+ * and wraps the sheet in `@layer widgets` for light mode.
+ */
+interface Props {
+    lang: string;
+    title: string;
+    footer: string;
+}
+
+const { lang, title, footer } = Astro.props;
+const builtAt = new Date();
+---
+
+<!doctype html>
+<html lang={lang}>
+    <head>
+        <meta charset="utf-8" />
+        <title>{title}</title>
+    </head>
+    <body>
+        <div class="card" data-lang={lang}>
+            <slot />
+            <footer class="footer">
+                <span>{footer} <span data-generator>Astro</span></span>
+                <time datetime={builtAt.toISOString()}>{builtAt.toISOString().slice(0, 16).replace('T', ' ')} UTC</time>
+            </footer>
+        </div>
+    </body>
+</html>
+
+<style>
+    .card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        height: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        color: inherit;
+        font: inherit;
+    }
+
+    .footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 4px 12px;
+        margin-top: auto;
+        font-size: 11px;
+        color: #6b7a88;
+    }
+</style>

@@ -72,18 +72,25 @@ portal-widget-sdk/
   schemas/              JSON schemas for widget-metadata.json and the zip's widget-metadata.json
   packages/sdk/         runtime package (browser, zero deps)
   packages/cli/         command line package (node)
-  examples/             end-to-end example widgets (serviceware-logo-three: three.js, exercises the whole SDK)
+  examples/             end-to-end example widgets, each its own pnpm project (three.js, React, Astro)
+  scripts/              repo tooling (examples.mjs runs a pnpm command in every example)
   reference/ssp-portal/ two Portal source snapshots read by the CLI drift spec
 ```
 
 ## Development
 
 ```bash
-pnpm install
+pnpm install          # SDK and CLI only; the examples are not part of this workspace
 pnpm build            # packages/*
 pnpm test
-pnpm build:examples   # needs the package dists from the previous step
+pnpm install:examples # each example is its own pnpm project linking ../../packages/*
+pnpm build:examples   # needs the package dists from `pnpm build`
 ```
+
+The examples under `examples/` are deliberately kept out of the root pnpm workspace so that a clone plus
+`pnpm install` only pulls what the SDK and CLI need (React, Astro and three.js stay out of the root
+lockfile). Run `pnpm install` inside an example folder, or `pnpm install:examples` at the root, when you
+want to work on one.
 
 Releases: every user-facing change adds a changeset (`pnpm changeset`). On push to `main` the release
 workflow opens or updates a "Version Packages" pull request; merging it publishes the bumped packages to npm.

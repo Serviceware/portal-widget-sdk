@@ -1,3 +1,4 @@
 packages:
   - packages/*
-  - examples/*
+# examples/* are standalone projects on purpose: each has its own `pnpm install`, so the root install
+# stays limited to what the SDK and CLI need. They link to ../../packages/* via the `link:` protocol.

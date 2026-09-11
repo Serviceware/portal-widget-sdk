@@ -1,0 +1,5 @@
+bundles/
+dev/harness.js
+dist-astro/
+.astro/
+*.zip

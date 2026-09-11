@@ -1,0 +1,29 @@
+{
+    "template": "custom",
+    "tagName": "astro-static-card",
+    "version": "1.0.0",
+    "name": [
+        { "language": "en", "value": "Astro Static Card" },
+        { "language": "de", "value": "Astro Static Card" }
+    ],
+    "description": [
+        {
+            "language": "en",
+            "value": "<p>A static quick-links card whose HTML and CSS are rendered by Astro at build time and mounted by the Portal Widget SDK. No framework runtime ships in the bundle; the widget only swaps the pre-rendered language variant and forwards link clicks to the Portal router.</p>"
+        },
+        {
+            "language": "de",
+            "value": "<p>Eine statische Quick-Links-Karte, deren HTML und CSS Astro zur Build-Zeit rendert und die das Portal Widget SDK einhängt. Im Bundle steckt keine Framework-Laufzeit; das Widget tauscht nur die vorgerenderte Sprachvariante und leitet Link-Klicks an den Portal-Router weiter.</p>"
+        }
+    ],
+    "changes": [{ "language": "en", "value": "<p>Initial version.</p>" }],
+    "tags": ["Portal", "Demo", "Astro"],
+    "defaultSize": { "columns": 3, "rows": 2 },
+    "angularVersion": 0,
+    "authenticated": false,
+    "dependencies": [{ "name": "Portal", "dependency": ">=3.0.0" }],
+    "custom": {
+        "fullBundlePath": "bundles/astro-static-card-1.0.0-full.js",
+        "lightBundlePath": "bundles/astro-static-card-1.0.0-light.js"
+    }
+}

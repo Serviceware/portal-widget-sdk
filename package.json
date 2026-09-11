@@ -16,20 +16,21 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm -r --filter \"./packages/*\" build",
-    "build:examples": "pnpm -r --filter \"./examples/*\" build",
     "test": "pnpm -r --filter \"./packages/*\" test",
     "lint": "pnpm -r --filter \"./packages/*\" lint",
-    "lint:examples": "pnpm -r --filter \"./examples/*\" lint",
     "typecheck": "pnpm -r --filter \"./packages/*\" typecheck",
+    "install:examples": "node scripts/examples.mjs install",
+    "build:examples": "node scripts/examples.mjs build",
+    "lint:examples": "eslint \"examples/*/src/**/*.{ts,tsx}\" \"examples/*/dev/*.ts\" \"examples/*/build.mjs\" scripts",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.0",
-    "@eslint/js": "^9.15.0",
-    "eslint": "^9.15.0",
-    "typescript": "^5.6.0",
-    "typescript-eslint": "^8.15.0"
+    "@changesets/cli": "^2.31.1",
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.0"
   }
 }

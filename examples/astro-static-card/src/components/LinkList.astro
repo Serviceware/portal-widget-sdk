@@ -1,0 +1,75 @@
+---
+/**
+ * Links with a `route` stay inside the Portal: the widget runtime (src/widget/main.ts) intercepts
+ * the click and calls the SDK's `navigate()`. Everything else is an ordinary external link.
+ */
+export interface Link {
+    label: string;
+    description: string;
+    href: string;
+    route?: string;
+    query?: Record<string, string>;
+}
+
+interface Props {
+    links: Link[];
+}
+
+const { links } = Astro.props;
+---
+
+<ul class="links">
+    {
+        links.map(link => (
+            <li>
+                <a
+                    class="link"
+                    href={link.href}
+                    data-route={link.route}
+                    data-query={link.query ? JSON.stringify(link.query) : undefined}
+                    target={link.route ? undefined : '_blank'}
+                    rel={link.route ? undefined : 'noopener noreferrer'}
+                >
+                    <strong>{link.label}</strong>
+                    <small>{link.description}</small>
+                </a>
+            </li>
+        ))
+    }
+</ul>
+
+<style>
+    .links {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .link {
+        display: grid;
+        gap: 2px;
+        padding: 8px 10px;
+        border: 1px solid #dfe6ee;
+        border-radius: 8px;
+        color: #1f2933;
+        text-decoration: none;
+        background: #f7f9fb;
+    }
+
+    .link:hover {
+        border-color: #0082bb;
+        background: #ffffff;
+    }
+
+    .link strong {
+        font-size: 13px;
+        color: #003f72;
+    }
+
+    .link small {
+        font-size: 11px;
+        color: #6b7a88;
+    }
+</style>

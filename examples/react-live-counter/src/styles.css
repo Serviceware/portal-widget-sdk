@@ -1,0 +1,203 @@
+/*
+ * Widget stylesheet. Keep every rule flat (no nested at-rules): build.mjs scopes each selector to
+ * `[react-live-counter]` and wraps the file in `@layer widgets` for light mode. `:host` maps to the
+ * Portal's host wrapper in light mode and to the shadow host in shadow mode.
+ *
+ * React itself never injects styles, so this file is the widget's only CSS.
+ */
+:host {
+    height: 100%;
+}
+
+.rlc-host {
+    display: block;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* The SDK mirrors the Portal's `hidden` input onto the element; author `display` must not defeat it. */
+.rlc-host[hidden] {
+    display: none;
+}
+
+.rlc-root {
+    --rlc-accent: #0082bb;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    color: inherit;
+    font: inherit;
+}
+
+.rlc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.rlc-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #003f72;
+    overflow-wrap: anywhere;
+}
+
+.rlc-clock {
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    color: #4a5a68;
+}
+
+.rlc-count {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.rlc-count-value {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--rlc-accent);
+}
+
+.rlc-count-target {
+    font-size: 13px;
+    color: #6b7a88;
+}
+
+.rlc-progress {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #e3e9ef;
+}
+
+.rlc-progress-bar {
+    height: 100%;
+    background: var(--rlc-accent);
+    transition: width 200ms linear;
+}
+
+.rlc-cadence {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7a88;
+}
+
+.rlc-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rlc-button {
+    padding: 4px 10px;
+    border: 1px solid #b9c6d2;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #1f2933;
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.rlc-button:hover {
+    border-color: var(--rlc-accent);
+    color: var(--rlc-accent);
+}
+
+.rlc-button-primary {
+    border-color: var(--rlc-accent);
+    background: var(--rlc-accent);
+    color: #ffffff;
+}
+
+.rlc-button-primary:hover {
+    filter: brightness(0.9);
+    color: #ffffff;
+}
+
+.rlc-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 12px;
+    margin-top: auto;
+    font-size: 11px;
+    color: #6b7a88;
+}
+
+.rlc-notice {
+    margin: 0;
+    padding: 12px;
+    color: #4a5a68;
+    font-size: 13px;
+}
+
+.rlc-settings {
+    --rlc-accent: #0082bb;
+    display: grid;
+    gap: 12px;
+    box-sizing: border-box;
+    padding: 8px;
+    font: inherit;
+}
+
+.rlc-settings-title {
+    margin: 0;
+    font-size: 16px;
+    color: #003f72;
+}
+
+.rlc-settings-intro {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7a88;
+}
+
+.rlc-field {
+    display: grid;
+    gap: 4px;
+}
+
+.rlc-field-inline {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
+}
+
+.rlc-field-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.rlc-field-invalid .rlc-field-label {
+    color: #b00020;
+}
+
+.rlc-field-invalid .rlc-input {
+    border-color: #b00020;
+}
+
+.rlc-input {
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #b9c6d2;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.rlc-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

@@ -1,0 +1,32 @@
+{
+    "en": {
+        "title": "Quick links",
+        "intro": "Rendered once by Astro when the widget was built. The Portal only receives HTML and CSS.",
+        "footer": "Pre-rendered by",
+        "settings": "Settings",
+        "settingsTitle": "Astro Static Card",
+        "settingsText": "This widget has no settings: its content is fixed at build time. Edit src/data/content.json, rebuild and upload the new bundles to change it.",
+        "close": "Close",
+        "links": [
+            { "label": "Portal home", "description": "Navigates inside the Portal through the SDK.", "href": "/home", "route": "/home" },
+            { "label": "Widget administration", "description": "Portal route with a query parameter.", "href": "/admin/configuration?tab=4", "route": "/admin/configuration", "query": { "tab": "4" } },
+            { "label": "Portal Widget SDK", "description": "Source and documentation on GitHub.", "href": "https://github.com/Serviceware/portal-widget-sdk" },
+            { "label": "Astro", "description": "The static site builder that rendered this card.", "href": "https://astro.build" }
+        ]
+    },
+    "de": {
+        "title": "Schnellzugriff",
+        "intro": "Einmal von Astro gerendert, als das Widget gebaut wurde. Das Portal erhält nur HTML und CSS.",
+        "footer": "Vorgerendert von",
+        "settings": "Einstellungen",
+        "settingsTitle": "Astro Static Card",
+        "settingsText": "Dieses Widget hat keine Einstellungen: sein Inhalt steht zur Build-Zeit fest. Zum Ändern src/data/content.json bearbeiten, neu bauen und die Bundles hochladen.",
+        "close": "Schließen",
+        "links": [
+            { "label": "Portal-Startseite", "description": "Navigiert über das SDK innerhalb des Portals.", "href": "/home", "route": "/home" },
+            { "label": "Widget-Verwaltung", "description": "Portal-Route mit Query-Parameter.", "href": "/admin/configuration?tab=4", "route": "/admin/configuration", "query": { "tab": "4" } },
+            { "label": "Portal Widget SDK", "description": "Quellcode und Dokumentation auf GitHub.", "href": "https://github.com/Serviceware/portal-widget-sdk" },
+            { "label": "Astro", "description": "Der Static-Site-Builder, der diese Karte gerendert hat.", "href": "https://astro.build" }
+        ]
+    }
+}

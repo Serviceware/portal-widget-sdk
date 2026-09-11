@@ -1,11 +1,14 @@
 {
-  "name": "@examples/serviceware-logo-three",
+  "name": "@examples/astro-static-card",
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "version": "1.0.0",
-  "description": "Example private widget: the Serviceware logo extruded in 3D with three.js, exercising every runtime feature of @serviceware/portal-widget-sdk.",
+  "description": "Example private widget whose content is pre-rendered by Astro at build time: a static quick-links card in two languages, mounted by @serviceware/portal-widget-sdk.",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "build": "tsc --noEmit && node build.mjs",
     "build:shadow": "tsc --noEmit && node build.mjs --css-mode shadow",
@@ -17,11 +20,8 @@
   "devDependencies": {
     "@serviceware/portal-widget-cli": "link:../../packages/cli",
     "@serviceware/portal-widget-sdk": "link:../../packages/sdk",
-    "@types/three": "^0.185.4",
+    "astro": "^7.3.2",
     "esbuild": "^0.28.2",
     "typescript": "^5.6.0"
-  },
-  "dependencies": {
-    "three": "^0.185.1"
   }
 }
