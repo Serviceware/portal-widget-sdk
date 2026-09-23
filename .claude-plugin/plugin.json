@@ -1,0 +1,11 @@
+{
+  "name": "portal-widget",
+  "displayName": "Serviceware Portal widgets",
+  "description": "Skill for building, testing and packing Serviceware Portal private widgets with @serviceware/portal-widget-sdk.",
+  "version": "0.1.0",
+  "author": { "name": "Serviceware SE", "url": "https://github.com/Serviceware" },
+  "homepage": "https://github.com/Serviceware/portal-widget-sdk",
+  "repository": "https://github.com/Serviceware/portal-widget-sdk",
+  "license": "MIT",
+  "keywords": ["serviceware", "portal", "widget", "custom-element"]
+}

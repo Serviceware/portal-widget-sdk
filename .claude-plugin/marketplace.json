@@ -1,0 +1,15 @@
+{
+  "name": "serviceware",
+  "description": "Claude Code plugins for building Serviceware Portal widgets.",
+  "owner": {
+    "name": "Serviceware SE",
+    "url": "https://github.com/Serviceware"
+  },
+  "plugins": [
+    {
+      "name": "portal-widget",
+      "source": "./",
+      "description": "Skill for building, testing and packing Serviceware Portal private widgets with @serviceware/portal-widget-sdk."
+    }
+  ]
+}
