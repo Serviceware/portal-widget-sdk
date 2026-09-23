@@ -30,6 +30,29 @@ field by field or by importing the zip the CLI produces.
 > proxy for Service Connections does not exist yet; see [packages/sdk/README.md](packages/sdk/README.md)
 > and [docs/security.md](docs/security.md).
 
+## Agent skill
+
+[`skills/portal-private-widget/`](skills/portal-private-widget/SKILL.md) is an
+[Agent Skill](https://agentskills.io) that teaches a coding agent (Claude Code, Codex, Cursor, …) to build,
+test and pack a private widget with this SDK. It is one self-contained file, with the project files inline.
+Install it whichever way suits your agent:
+
+```bash
+# Any agent, pinned to the CLI version you use (recommended once the packages are on npm)
+npx @serviceware/portal-widget-cli skill install            # -> .claude/skills and .agents/skills
+npx @serviceware/portal-widget-cli skill install --global   # into your home directory instead
+
+# Any agent, straight from GitHub (github.com/vercel-labs/skills)
+npx skills add Serviceware/portal-widget-sdk --skill portal-private-widget
+
+# Claude Code plugin marketplace (updates with /plugin marketplace update)
+/plugin marketplace add Serviceware/portal-widget-sdk
+/plugin install portal-widget@serviceware
+```
+
+Or copy `skills/portal-private-widget/` into your agent's skills directory by hand. The GitHub-based
+routes need this repository to be public.
+
 ## Why a separate public repo
 
 - The Portal monorepo's widget tooling (`@ssp/utils`, `@ssp/core`, `@codeblue/*`) lives on private Azure
@@ -73,6 +96,7 @@ portal-widget-sdk/
   packages/sdk/         runtime package (browser, zero deps)
   packages/cli/         command line package (node)
   examples/             end-to-end example widgets, each its own pnpm project (three.js, React, Astro)
+  skills/               agent skill for building a widget with the SDK (single SKILL.md)
   scripts/              repo tooling (examples.mjs runs a pnpm command in every example)
   reference/ssp-portal/ two Portal source snapshots read by the CLI drift spec
 ```

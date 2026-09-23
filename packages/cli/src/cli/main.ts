@@ -6,6 +6,7 @@ import { readConfig } from '../lib/config';
 import { nextAction } from '../lib/output';
 import { packWidget } from '../lib/pack';
 import { CLI_BIN_NAME, CONFIG_FILE_NAME } from '../lib/package-identity';
+import { installSkill, SKILL_TARGETS, SkillTarget } from '../lib/skill';
 import { unpackWidget } from '../lib/unpack';
 import { formatIssues, validateConfig, validateZip } from '../lib/validate';
 import { WizardIo, runWizard } from '../lib/wizard';
@@ -20,6 +21,7 @@ Usage:
   ${CLI_BIN_NAME} pack [--config <path>] [--out <dir>]
   ${CLI_BIN_NAME} validate <${CONFIG_FILE_NAME} | *.zip>
   ${CLI_BIN_NAME} unpack <zip> [--out <dir>] [--force] [--with-bundles]
+  ${CLI_BIN_NAME} skill install [--dir <dir> | --global] [--target claude|agents] [--force]
   ${CLI_BIN_NAME} --help
 
 Commands:
@@ -27,6 +29,8 @@ Commands:
   pack       Config -> <tagName>.zip
   validate   Per-field pass/fail report against the dialog's own rules
   unpack     ZIP -> editable ${CONFIG_FILE_NAME}, recovered even from a foreign archive
+  skill      Install the coding-agent skill into .claude/skills and .agents/skills
+             (--target limits it to one; repeatable)
 `);
 }
 
@@ -97,6 +101,36 @@ async function runUnpack(argv: string[]): Promise<void> {
     console.log(result.nextAction);
 }
 
+async function runSkill(argv: string[]): Promise<void> {
+    const { values, positionals } = parseArgs({
+        args: argv,
+        options: {
+            dir: { type: 'string' },
+            global: { type: 'boolean', default: false },
+            target: { type: 'string', multiple: true },
+            force: { type: 'boolean', default: false }
+        },
+        allowPositionals: true
+    });
+
+    const usage = `Usage: ${CLI_BIN_NAME} skill install [--dir <dir> | --global] [--target claude|agents] [--force]`;
+    const targets = (values.target as string[] | undefined) ?? [];
+    const unknownTarget = targets.find(target => !(target in SKILL_TARGETS));
+    if (positionals[0] !== 'install' || positionals.length > 1 || unknownTarget !== undefined || (values.global && values.dir)) {
+        console.error(unknownTarget !== undefined ? `Unknown --target "${unknownTarget}".\n${usage}` : usage);
+        process.exitCode = 1;
+        return;
+    }
+
+    const result = installSkill({
+        dir: values.dir as string | undefined,
+        global: values.global as boolean,
+        targets: targets as SkillTarget[],
+        force: values.force as boolean
+    });
+    console.log(result.nextAction);
+}
+
 /**
  * Backs `WizardIo` with `node:readline/promises` over the real terminal.
  * Reads lines through the interface's own async iterator rather than
@@ -145,6 +179,9 @@ export async function main(argv = process.argv.slice(2)): Promise<void> {
             return;
         case 'unpack':
             await runUnpack(rest);
+            return;
+        case 'skill':
+            await runSkill(rest);
             return;
         default:
             console.error(`Unknown command "${command}".`);

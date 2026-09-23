@@ -42,6 +42,8 @@ function detailsFor(kind: NextActionKind): NextActionDetails {
                 fullBundlePath: 'bundles/ssp-status-page-1.0.0-full.js',
                 lightBundlePath: 'bundles/ssp-status-page-1.0.0-light.js'
             };
+        case 'skill-install':
+            return { skillPaths: ['/tmp/project/.claude/skills/portal-private-widget/SKILL.md'] };
         default:
             return {};
     }
@@ -148,5 +150,23 @@ describe('CLI dispatcher -- no command completes silently', () => {
 
         expect(loggedLines()).toContain('portal-widget.json');
         expect(loggedLines()).toContain('run pack');
+    });
+
+    it('skill install records the installed skill paths and how to update them', async () => {
+        await main(['skill', 'install', '--dir', tempDir, '--target', 'claude']);
+
+        expect(loggedLines()).toContain(path.join(tempDir, '.claude', 'skills', 'portal-private-widget', 'SKILL.md'));
+        expect(loggedLines()).toContain('--force');
+    });
+
+    it('skill without the install subcommand prints usage and fails', async () => {
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        try {
+            await main(['skill', 'add']);
+            expect(errorSpy.mock.calls.map(call => call[0]).join('\n')).toContain('skill install');
+            expect(process.exitCode).toBe(1);
+        } finally {
+            errorSpy.mockRestore();
+        }
     });
 });

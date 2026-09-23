@@ -18,6 +18,12 @@
 - CSS: read `docs/css-isolation.md` before touching the build pipeline. Every widget stylesheet must end up
   either inside a shadow root or scoped to `[<tag>]` inside `@layer widgets`. No exceptions.
 
+- `skills/portal-private-widget/SKILL.md` is the one copy of the agent skill. It ships three ways: in the
+  CLI package (tsup copies it to the gitignored `packages/cli/skills/`), as a Claude Code plugin
+  (`.claude-plugin/`), and straight from GitHub via `npx skills add`. When contract, SDK or CLI behaviour
+  changes, update the skill in the same change, add a CLI changeset (the skill ships in that package), and
+  bump `version` in `.claude-plugin/plugin.json`.
+
 ## Conventions
 
 - TypeScript strict. ESM first, CJS build only where a consumer needs it.

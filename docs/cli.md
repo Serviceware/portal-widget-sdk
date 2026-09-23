@@ -92,6 +92,22 @@ Port of the Portal's `prepare-widget-release` tool (SSP_Portal
   carry the real semver; the bundle names inside may not).
 - Prints the admin steps: Portal Admin → Widgets → Add private widget → Import zip.
 
+## `portal-widget skill install` (implemented)
+
+```
+portal-widget skill install [--dir <dir> | --global] [--target claude|agents]... [--force]
+```
+
+- Copies the agent skill (`skills/portal-private-widget/SKILL.md` at the repo root; the build ships a copy in
+  the package) into `<base>/.claude/skills/portal-private-widget/` (Claude Code) and
+  `<base>/.agents/skills/portal-private-widget/` (other Agent Skills clients). `<base>` is `--dir`, the
+  current directory by default, or the home directory with `--global`. `--target` limits the install to the
+  targets you name.
+- An identical copy is reported as up to date. A copy that differs (local edits, or an older CLI version) is
+  only replaced with `--force`. Every target is checked before anything is written.
+- The skill is versioned with the CLI, so after upgrading the CLI, `skill install --force` brings the skill up
+  to date with it.
+
 ## `portal-widget publish` (later, needs decision)
 
 `POST {apiUrl}/api/v2/admin/widgets/private` with the multipart fields from `docs/contract.md` §9, using an

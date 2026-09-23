@@ -2,7 +2,7 @@ import * as path from 'node:path';
 
 const PORTAL_IMPORT_LOCATION = 'admin/configuration?tab=4';
 
-export type NextActionKind = 'pack' | 'validate-config' | 'validate-zip' | 'unpack' | 'wizard-custom';
+export type NextActionKind = 'pack' | 'validate-config' | 'validate-zip' | 'unpack' | 'wizard-custom' | 'skill-install';
 
 /**
  * Every kind `nextAction` handles, in dispatch order. A spec iterates this
@@ -15,7 +15,8 @@ export const NEXT_ACTION_KINDS: readonly NextActionKind[] = [
     'validate-config',
     'validate-zip',
     'unpack',
-    'wizard-custom'
+    'wizard-custom',
+    'skill-install'
 ];
 
 export interface NextActionDetails {
@@ -25,6 +26,8 @@ export interface NextActionDetails {
     tagName?: string;
     fullBundlePath?: string;
     lightBundlePath?: string;
+    skillPaths?: string[];
+    unchangedSkillPaths?: string[];
 }
 
 /**
@@ -64,6 +67,13 @@ export function nextAction(kind: NextActionKind, details: NextActionDetails = {}
                 `Wrote ${path.resolve(details.configPath as string)}`,
                 `Next: build your widget with any framework into ${details.fullBundlePath} and ${details.lightBundlePath},`,
                 `each a classic script that calls customElements.define('${details.tagName}', ...), then run pack.`
+            ].join('\n');
+        case 'skill-install':
+            return [
+                ...(details.skillPaths ?? []).map(skillPath => `Installed ${skillPath}`),
+                ...(details.unchangedSkillPaths ?? []).map(skillPath => `Up to date ${skillPath}`),
+                'Next: ask your coding agent to build a Portal widget; the skill walks it through build, validate and pack.',
+                'After upgrading this CLI, re-run skill install --force to update the skill.'
             ].join('\n');
         default:
             throw new Error(`Unknown nextAction kind: ${kind as string}`);

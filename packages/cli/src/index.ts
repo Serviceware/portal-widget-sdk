@@ -9,3 +9,4 @@ export * from './lib/unpack';
 export * from './lib/slugify';
 export * from './lib/wizard';
 export * from './lib/output';
+export * from './lib/skill';

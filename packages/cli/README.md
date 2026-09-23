@@ -27,6 +27,7 @@ the original author's handover with every trap is
 | `portal-widget pack [--config <path>] [--out <dir>]` | Config to `<tagName>.zip`; refuses to write anything `validate` would reject |
 | `portal-widget validate <portal-widget.json \| *.zip>` | Per-field pass/fail report, exit 1 on any error |
 | `portal-widget unpack <zip> [--out <dir>] [--force] [--with-bundles]` | ZIP to editable `portal-widget.json`, recovered even from a foreign (Portal-exported) archive |
+| `portal-widget skill install [--dir <dir> \| --global] [--target claude\|agents] [--force]` | Installs the coding-agent skill for building widgets into `.claude/skills/` and `.agents/skills/`; refuses to overwrite a locally modified copy without `--force` |
 | `portal-widget --help` | Usage |
 
 Every command that completes successfully ends by printing a next action, including where to click in

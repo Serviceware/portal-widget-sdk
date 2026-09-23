@@ -1,6 +1,8 @@
 node_modules/
 dist/
 coverage/
+# Build-time copy of <repo>/skills shipped in the CLI package (see packages/cli/tsup.config.ts).
+packages/cli/skills/
 *.tgz
 *.log
 .env
