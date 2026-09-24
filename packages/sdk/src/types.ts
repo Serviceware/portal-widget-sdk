@@ -77,7 +77,10 @@ export type SecurityMode = (typeof SecurityModes)[keyof typeof SecurityModes];
 
 export interface ServiceConnectionSecurity {
     mode: SecurityMode;
-    /** Header values must never be exposed to the browser. See docs/security.md. */
+    /**
+     * Header values must never be exposed to the browser. A Portal with the Service Connection proxy
+     * returns every value as `"********"`; older Portals leak the real value. See docs/security.md.
+     */
     headers?: { key: string; value: string }[];
 }
 

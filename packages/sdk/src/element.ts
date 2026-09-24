@@ -9,6 +9,7 @@ import { ELEMENT_INPUTS, ElementInputName, PRIVATE_WIDGET_VERSION, translationsP
 import { onWidgetResize, showConfiguration, toast, WidgetSize } from './events';
 import { createPortalFetch } from './fetch';
 import { cancelConfiguration, saveConfiguration } from './outputs';
+import { createServiceClient, ServiceFetch } from './service-client';
 import type { ConfigSchema, PortalWidgetInputs, WidgetConfig } from './types';
 
 export type CssMode = 'shadow' | 'light';
@@ -21,16 +22,29 @@ export interface WidgetContext<T> {
     readonly inputs: Readonly<PortalWidgetInputs<T>>;
     /** `fetch` that adds the Portal bearer token for `apiUrl` requests only. */
     readonly fetch: typeof fetch;
+    /**
+     * EXPERIMENTAL. Fetch through a Service Connection linked to this instance, by id or name. The
+     * Portal injects the connection's credentials server-side; the widget never sees them.
+     */
+    service(connectionIdOrName: string): ServiceFetch;
     readonly toast: typeof toast;
     /** Asks the Portal to open the settings dialog for this instance. */
     openSettings(): void;
-    /** Clones the current configuration with `customConfig` replaced and dispatches `configurationSaved`. */
-    save(customConfig: T): void;
+    /**
+     * Clones the current configuration with `customConfig` replaced and dispatches `configurationSaved`.
+     * `options.serviceConnectionsId` links Service Connections to this instance (the Portal persists it).
+     */
+    save(customConfig: T, options?: SaveOptions): void;
     cancel(): void;
     /** Portal resize events for this instance. Automatically unsubscribed on disconnect. */
     onResize(cb: (size: WidgetSize) => void): () => void;
     /** GET `storage/v1/widgets/{tag}/{version}/translations/{lang}` through `fetch`. */
     loadTranslations(lang?: string): Promise<Record<string, string>>;
+}
+
+export interface SaveOptions {
+    /** Replaces `configuration.serviceConnectionsId`, i.e. which Service Connections this instance may use. */
+    serviceConnectionsId?: string[];
 }
 
 export interface DefinePortalWidgetOptions<T> {
@@ -179,23 +193,29 @@ export function definePortalWidget<T = Record<string, unknown>>(options: DefineP
 
         private _createContext(root: ShadowRoot | HTMLElement): WidgetContext<T> {
             const inputs = this._inputs;
-            const portalFetch = createPortalFetch(() => ({
+            const getAuth = () => ({
                 apiUrl: inputs.apiUrl ?? '',
                 authToken: inputs.authToken ?? ''
-            }));
+            });
+            const portalFetch = createPortalFetch(getAuth);
 
             return {
                 element: this,
                 root,
                 inputs,
                 fetch: portalFetch,
+                service: (connectionIdOrName: string): ServiceFetch =>
+                    createServiceClient(() => ({ ...getAuth(), configuration: inputs.configuration }), connectionIdOrName),
                 toast,
                 openSettings: (): void => {
                     showConfiguration(inputs.configuration);
                 },
-                save: (customConfig: T): void => {
+                save: (customConfig: T, saveOptions?: SaveOptions): void => {
                     const next = cloneConfig(inputs.configuration);
                     next.customConfig = customConfig;
+                    if (saveOptions?.serviceConnectionsId) {
+                        next.serviceConnectionsId = [...saveOptions.serviceConnectionsId];
+                    }
                     saveConfiguration(this, next, configSchema);
                 },
                 cancel: (): void => {

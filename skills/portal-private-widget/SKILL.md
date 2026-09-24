@@ -302,8 +302,13 @@ compliance probe requires.
   `SecretInConfigError` if they are non-empty.
 - `authToken` is the user's Portal session. Only send it to `apiUrl` (via `ctx.fetch`); never forward or
   store it.
-- **No secure way exists today to call a third-party API with a private key** (there's no Service Connection
-  proxy yet). Tell the user plainly. The options are a key that is public by design and referrer-restricted
+- **No released Portal can call a third-party API with a private key securely** (there's no Service
+  Connection proxy in production). Tell the user plainly. An **experimental** `ctx.service('<connection
+  name>')(path)` exists for Portals running the backend proof of concept (`poc/widget-connection-proxy`,
+  docs/service-connection-proxy.md). The admin stores the key in a Service Connection. The widget's settings view
+  lists connections via `ctx.fetch('api/v2/admin/serviceconnections')` and links the chosen one with
+  `ctx.save(customConfig, { serviceConnectionsId: [id] })`; `customConfig` holds only the id. Offer it only if the user confirms their Portal has
+  that backend, and never as a production solution. The options are a key that is public by design and referrer-restricted
   (can go in `customConfig`, documented as public), or their own backend that holds the key and validates the
   forwarded Portal token.
 - No `.env` files, no source maps, bundles < 10 MB.

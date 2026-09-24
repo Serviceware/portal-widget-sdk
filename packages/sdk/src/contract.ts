@@ -112,3 +112,17 @@ export function isValidPrivateWidgetTag(tag: string): boolean {
 
 /** Environment variable prefix the CLI is allowed to inline into bundles. */
 export const PUBLIC_ENV_PREFIX = 'PORTAL_WIDGET_PUBLIC_' as const;
+
+/**
+ * Service Connection proxy (docs/contract.md section 5a). EXPERIMENTAL: needs a Portal backend
+ * with the proxy endpoint. The Portal injects the connection's stored headers server-side.
+ */
+export const SERVICE_PROXY_PATH = 'api/v1/proxy' as const;
+
+/** Header carrying the route-widget instance id; the connection must be linked to that instance. */
+export const WIDGET_INSTANCE_HEADER = 'X-Portal-Widget-Instance' as const;
+
+/** Path relative to `apiUrl`: `api/v1/proxy/{connectionId}/{path}`. */
+export function serviceProxyPath(connectionId: string, path = ''): string {
+    return `${SERVICE_PROXY_PATH}/${encodeURIComponent(connectionId)}/${path.replace(/^\/+/, '')}`;
+}

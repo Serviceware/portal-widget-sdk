@@ -12,7 +12,10 @@ npm scope: `@serviceware` (confirmed).
 > `createServiceClient`. Authenticated calls are limited to the **Portal API as the current user**
 > (`createPortalFetch`, section 5). Private keys must stay in a backend you control. Widget authors are told
 > this in the package README and in [getting-started.md](getting-started.md) section 9; do not add any API
-> that looks like it authenticates against third parties before the proxy exists.
+> that looks like it authenticates against third parties before the proxy exists. The one exception is the
+> **experimental** `createServiceClient` / `ctx.service` (section 5a). It targets the backend POC in
+> [service-connection-proxy.md](service-connection-proxy.md) and must stay marked experimental until that
+> backend change ships.
 
 ---
 
@@ -148,16 +151,32 @@ This is the **only** authentication the SDK offers, and it authenticates the cur
 Portal, not the widget against anything else. There is no way to attach a widget-owned or third-party
 credential; see the note at the top of this document.
 
-### 5a. Planned: `createServiceClient` (blocked on the Portal)
+### 5a. Experimental: `createServiceClient` / `ctx.service` (needs the backend POC)
 
 ```ts
-// NOT SHIPPED. Requires the Portal proxy described in backend-findings.md section 4.
-export function createServiceClient(config: WidgetConfig, connectionIdOrName: string): typeof fetch;
+export type ServiceFetch = (path: string, init?: RequestInit) => Promise<Response>;
+export function createServiceClient(
+    getSource: () => { apiUrl: string; authToken: string; configuration: WidgetConfig<unknown> | undefined },
+    connectionIdOrName: string
+): ServiceFetch;
+export function resolveServiceConnection(config, connectionIdOrName): { id: string } | undefined;
+export class ServiceConnectionNotFoundError extends Error { readonly connection: string }
+// WidgetContext: service(connectionIdOrName: string): ServiceFetch
 ```
 
-Would target `{apiUrl}/api/v1/proxy/{connectionId}/...` with the Portal bearer token; the Portal would
-inject the Service Connection's headers server-side so the key never reaches the browser. Ships only once
-that endpoint exists and the header-value leak in the anonymous config endpoints is fixed.
+- Targets `{apiUrl}/api/v1/proxy/{connectionId}/{path}` (contract.md §5a) through `createPortalFetch`, so
+  the Portal bearer token is attached by the same origin rule. A caller-supplied `Authorization` header is
+  dropped. `X-Portal-Widget-Instance` is set to `configuration.id`.
+- `connectionIdOrName` is matched against `serviceConnections[].id`, then `serviceConnectionsId`, then
+  `serviceConnections[].name` (case-insensitive). `getSource` is read on every call.
+- Rejects without sending anything: `ServiceConnectionNotFoundError` when nothing matches, `TypeError` for
+  absolute or protocol-relative URLs and for `.` / `..` path segments.
+- The Portal injects the connection's credentials server-side. The widget never sees them. Design, backend
+  changes and known gaps: [service-connection-proxy.md](service-connection-proxy.md).
+- Linking: `ctx.save(customConfig, { serviceConnectionsId: [connectionId] })` (`SaveOptions`) replaces
+  `configuration.serviceConnectionsId`, and the Portal persists it. Store the connection **id** in
+  `customConfig`: it resolves immediately through `serviceConnectionsId`, before the Portal re-sends the
+  linked connection objects.
 
 ---
 

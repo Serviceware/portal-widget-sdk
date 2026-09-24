@@ -114,6 +114,9 @@ Needed for Tier 1. Minimal design that fits the existing gateway:
 
 Until this exists, SDK docs state plainly that private API keys cannot be used securely from a widget.
 
+**POC:** implemented, together with the §2 redaction and encryption at rest, on the `portal-backend`
+branch `poc/widget-connection-proxy`. See [service-connection-proxy.md](service-connection-proxy.md).
+
 ---
 
 ## 5. Portal-side backlog items resulting from this analysis

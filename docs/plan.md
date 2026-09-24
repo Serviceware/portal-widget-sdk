@@ -87,7 +87,8 @@
 ### Phase 4 — Portal side
 - [ ] contract drift spec PR in SSP_Portal
 - [ ] compliance probe PR
-- [ ] backend answers on proxy/redaction, then SDK `createServiceClient`
+- [ ] backend answers on proxy/redaction, then SDK `createServiceClient` (POC: backend branch
+  `poc/widget-connection-proxy`, experimental `ctx.service`; see service-connection-proxy.md)
 
 ### Later
 - Angular preset (port `webpack.externals.js`, `extra-webpack.config.js`, `elements-build-script.js`,
