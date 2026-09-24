@@ -1,0 +1,29 @@
+{
+    "template": "custom",
+    "tagName": "service-connection-demo",
+    "version": "1.0.0",
+    "name": [
+        { "language": "en", "value": "Service Connection Demo" },
+        { "language": "de", "value": "Service-Connection-Demo" }
+    ],
+    "description": [
+        {
+            "language": "en",
+            "value": "<p>Experimental. Calls a third-party API through a Portal Service Connection. The Portal injects the API key on the server, so it never reaches the browser.</p>"
+        },
+        {
+            "language": "de",
+            "value": "<p>Experimentell. Ruft eine Fremd-API über eine Portal Service Connection auf. Das Portal setzt den API-Schlüssel auf dem Server ein, er erreicht den Browser nie.</p>"
+        }
+    ],
+    "changes": [{ "language": "en", "value": "<p>Initial version.</p>" }],
+    "tags": ["Portal", "Demo", "Service-Connection"],
+    "defaultSize": { "columns": 4, "rows": 3 },
+    "angularVersion": 0,
+    "authenticated": true,
+    "dependencies": [{ "name": "Portal", "dependency": ">=3.0.0" }],
+    "custom": {
+        "fullBundlePath": "bundles/service-connection-demo-1.0.0-full.js",
+        "lightBundlePath": "bundles/service-connection-demo-1.0.0-light.js"
+    }
+}

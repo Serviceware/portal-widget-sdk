@@ -176,6 +176,25 @@ describe('definePortalWidget', () => {
         expect(saved).toHaveLength(1);
     });
 
+    it('save() can link Service Connections to the instance via serviceConnectionsId', async () => {
+        const tag = nextTag();
+        let ctx!: WidgetContext<Partial<Settings>>;
+        definePortalWidget<Partial<Settings>>({ tag, configSchema: schema, render: c => void (ctx = c) });
+
+        const element = document.createElement(tag) as Inputs;
+        element.configuration = { ...makeConfig({}), serviceConnectionsId: ['old'] };
+        document.body.appendChild(element);
+        await flush();
+
+        const saved: CustomEvent[] = [];
+        element.addEventListener('configurationSaved', e => saved.push(e as CustomEvent));
+        ctx.save({ greeting: 'a' });
+        ctx.save({ greeting: 'b' }, { serviceConnectionsId: ['sc-1', 'sc-2'] });
+
+        expect(saved[0]!.detail.serviceConnectionsId).toEqual(['old']);
+        expect(saved[1]!.detail.serviceConnectionsId).toEqual(['sc-1', 'sc-2']);
+    });
+
     it('cancel() and openSettings() dispatch the contract events', async () => {
         const tag = nextTag();
         let ctx!: WidgetContext<Partial<Settings>>;

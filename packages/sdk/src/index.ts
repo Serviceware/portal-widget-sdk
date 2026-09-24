@@ -9,5 +9,6 @@ export * from './types';
 export * from './events';
 export * from './outputs';
 export * from './fetch';
+export * from './service-client';
 export * from './config';
 export * from './element';

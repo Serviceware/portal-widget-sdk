@@ -142,6 +142,32 @@ Other events exist in the Portal (`eventSwPortalLogin`, `eventSwPortalLogout`, `
     header `x-sw-language` tells which language was actually served. Private widgets' uploaded `<lang>.json`
     files are served here.
 
+### 5a. Service Connection proxy (EXPERIMENTAL, not in any released Portal)
+
+Exists only on the backend POC branch; see [service-connection-proxy.md](service-connection-proxy.md).
+
+```
+{GET|POST|PUT|PATCH|DELETE} {apiUrl}/api/v1/proxy/{connectionId}/{path}?{query}
+Authorization: Bearer <authToken>             required; stripped before the upstream call
+X-Portal-Widget-Instance: <configuration.id>  required; the connection must be linked to this instance
+```
+
+- The Portal forwards to `{serviceConnection.url}/{path}?{query}` with the connection's stored headers.
+- Only these request headers pass: `Accept`, `Accept-Language`, `Content-Type`, `Content-Language`,
+  `If-*`, `Range`.
+- Only these response headers pass: `Content-Type`, `Content-Language`, `Content-Disposition`,
+  `Content-Range`, `Accept-Ranges`, `Cache-Control`, `ETag`, `Last-Modified`, `Expires`, `Retry-After`,
+  plus `X-Content-Type-Options: nosniff`.
+- Errors: `400` for a missing or invalid instance header or a path escaping the base URL. `401` when not
+  logged in. `404` when the connection is unknown, belongs to another tenant or is not linked. `502` when
+  upstream is unreachable or the response exceeds 10 MB. `504` after 30 s.
+- On a Portal with the proxy, `configuration.serviceConnections[].security` is an object and every
+  `headers[].value` is `"********"`. Older Portals send `security` as a JSON string with real values.
+- **Linking a connection to an instance.** The widget's settings view sets `serviceConnectionsId` on the
+  configuration it emits with `configurationSaved`, and the Portal persists it. Only a backend with the POC
+  stores the link; older backends ignore the field. The settings view can list candidates with
+  `GET {apiUrl}/api/v2/admin/serviceconnections` (admin only, values masked).
+
 ---
 
 ## 6. Light vs full bundles

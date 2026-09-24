@@ -1,0 +1,4 @@
+# Makes this example its own pnpm workspace root, so `pnpm install` here does not join the SDK
+# repository's workspace two levels up. The SDK and CLI are linked via `link:` in package.json.
+packages:
+  - .

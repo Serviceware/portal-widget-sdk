@@ -56,8 +56,10 @@ credential.** This is a Portal limitation, not something the SDK can work around
   visitors through its configuration endpoints (see
   [`docs/backend-findings.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/backend-findings.md)
   sections 1 and 2).
-- Therefore the SDK ships **no** `createServiceClient` and no helper for API keys. It will be added when
-  the Portal provides the server-side proxy.
+- Therefore the SDK ships no production helper for API keys. An **experimental** `ctx.service(name)` /
+  `createServiceClient` targets a backend proof of concept that adds the proxy. It does not work on any
+  released Portal. See
+  [`docs/service-connection-proxy.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/service-connection-proxy.md).
 
 What you can do today:
 

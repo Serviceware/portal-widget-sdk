@@ -12,6 +12,7 @@ root lockfile. Install an example only when you want to run it.
 |---|---|
 | [`serviceware-logo-three/`](serviceware-logo-three/) | The Serviceware logo in 3D (three.js). Reference widget for every SDK runtime feature: settings UI in `settingsMode` with save/cancel and the secret guard, all toast severities, open-settings, navigate, skeleton, translations through the authenticated fetch, resize handling, `debugConfig`, light and shadow CSS modes. Ships a Portal-mock dev harness (`pnpm dev`) with a copy of the CSS compliance probe. |
 | [`react-live-counter/`](react-live-counter/) | A changing widget in **React 19 + TypeScript**: self-ticking counter, clock, progress towards a target, React settings form. Shows the framework pattern the SDK expects: `createRoot(ctx.root)`, `onInputsChange` bridged into `useSyncExternalStore`, one React root per element instance, flat CSS scoped by the build. Harness on port 4202. |
+| [`service-connection-demo/`](service-connection-demo/) | **Experimental.** Calls a third-party API through a Portal Service Connection with `ctx.service(name)`, so the API key stays on the server. Needs the backend proxy POC ([docs/service-connection-proxy.md](../docs/service-connection-proxy.md)); the dev server mocks that proxy with the same rules. Harness on port 4204. |
 | [`astro-static-card/`](astro-static-card/) | A static widget whose HTML and CSS are **pre-rendered by Astro** at build time, per language. No framework runtime in the bundle; the SDK runtime only sets `innerHTML`, picks the language variant and forwards link clicks to `navigate()`. Shows that the SDK needs nothing from a framework but DOM output. Harness on port 4203. |
 
 Planned: a `lit/` variant.
@@ -20,7 +21,7 @@ Planned: a `lit/` variant.
 pnpm install && pnpm build      # repository root: the examples import the built package dists
 pnpm install:examples           # or `pnpm install` inside one example folder
 pnpm build:examples             # or `pnpm build` inside one example folder
-cd examples/serviceware-logo-three && pnpm dev     # or react-live-counter, astro-static-card
+cd examples/serviceware-logo-three && pnpm dev     # or react-live-counter, astro-static-card, service-connection-demo
 ```
 
 `pnpm lint:examples` at the root lints all examples with the repository's ESLint config.

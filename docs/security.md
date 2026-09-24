@@ -54,9 +54,11 @@ The SDK documentation says so plainly (package README, first section; `docs/sdk.
 authors who need a private key must put it in a backend they control that validates the forwarded Portal
 token.
 
-SDK surface once the proxy exists: `createServiceClient(config, connectionIdOrName)` returning a
-`fetch`-compatible function that targets `{apiUrl}/api/v1/proxy/{id}/…` and attaches the Portal bearer
-token.
+**Proof of concept (experimental):** the backend branch `poc/widget-connection-proxy` implements the
+proxy, encrypts header values at rest and masks them in every read model. The SDK exposes it as
+`ctx.service(nameOrId)` / `createServiceClient`. See [service-connection-proxy.md](service-connection-proxy.md),
+including the gaps (page authorisation, SSRF, key management) that block production use. Until that
+backend change ships, the statement above holds for every released Portal.
 
 ### Tier 2 — Browser-safe public keys in `customConfig`
 
