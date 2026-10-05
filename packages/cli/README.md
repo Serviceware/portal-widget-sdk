@@ -1,4 +1,4 @@
-# @serviceware/portal-widget-cli
+# @serviceware-oss/portal-widget-cli
 
 `portal-widget`: turns a hand-written or wizard-generated `portal-widget.json` into a Portal-importable
 private widget ZIP, and recovers the config back out of any ZIP, including one the Portal itself exported.
@@ -6,8 +6,8 @@ One command, one ZIP. Runtime dependency: `fflate`. Nothing from the Portal mono
 no internal feed.
 
 ```bash
-npx @serviceware/portal-widget-cli            # run the wizard without installing
-npm install --save-dev @serviceware/portal-widget-cli   # or add it to a widget project: npx portal-widget ...
+npx @serviceware-oss/portal-widget-cli            # run the wizard without installing
+npm install --save-dev @serviceware-oss/portal-widget-cli   # or add it to a widget project: npx portal-widget ...
 ```
 
 Node 20 or newer. The package name, the bin name, the config file name and the ZIP sidecar name are held in

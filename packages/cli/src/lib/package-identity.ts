@@ -1,9 +1,9 @@
 /**
  * Single point of truth for the package identity. The npm scope is
- * `@serviceware` (confirmed; docs/plan.md, decision 1). No other module in
+  * `@serviceware-oss` (confirmed; docs/plan.md, decision 1). No other module in
  * this package may hardcode the package name string.
  */
-export const PACKAGE_NAME = '@serviceware/portal-widget-cli';
+export const PACKAGE_NAME = '@serviceware-oss/portal-widget-cli';
 
 export const CLI_BIN_NAME = 'portal-widget';
 

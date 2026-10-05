@@ -5,7 +5,7 @@
  * mocks toasts, the settings dialog, the skeleton and resize events, and runs a copy of the
  * CSS compliance probe. Translations come from build.mjs's mock API.
  */
-import { ELEMENT_OUTPUTS, PORTAL_EVENTS, PortalEventName, portalEventType } from '@serviceware/portal-widget-sdk/contract';
+import { ELEMENT_OUTPUTS, PORTAL_EVENTS, PortalEventName, portalEventType } from '@serviceware-oss/portal-widget-sdk/contract';
 import type {
     LanguageInfo,
     PortalWidgetInputs,
@@ -13,7 +13,7 @@ import type {
     ScreenLayout,
     ToastOptions,
     WidgetConfig
-} from '@serviceware/portal-widget-sdk';
+} from '@serviceware-oss/portal-widget-sdk';
 
 const TAG = __WIDGET_TAG__;
 const VERSION = __WIDGET_VERSION__;

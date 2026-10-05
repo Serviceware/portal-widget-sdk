@@ -2,7 +2,7 @@
  * Entry point. build.mjs bundles this into a single classic script that calls
  * `customElements.define('serviceware-logo-three', ...)` through `definePortalWidget`.
  */
-import { definePortalWidget, type WidgetContext } from '@serviceware/portal-widget-sdk';
+import { definePortalWidget, type WidgetContext } from '@serviceware-oss/portal-widget-sdk';
 import type { MountedView } from './dom';
 import { LogoSettings, schema } from './schema';
 import { mountAdminOnlyNotice, mountSettings } from './settings-view';

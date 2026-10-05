@@ -1,4 +1,4 @@
-import type { LanguageTranslations } from '@serviceware/portal-widget-sdk';
+import type { LanguageTranslations } from '@serviceware-oss/portal-widget-sdk';
 
 export type Texts = Record<string, string>;
 

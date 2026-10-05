@@ -9,7 +9,7 @@
     {
       "name": "portal-widget",
       "source": "./",
-      "description": "Skill for building, testing and packing Serviceware Portal private widgets with @serviceware/portal-widget-sdk."
+      "description": "Skill for building, testing and packing Serviceware Portal private widgets with @serviceware-oss/portal-widget-sdk."
     }
   ]
 }

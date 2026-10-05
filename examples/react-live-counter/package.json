@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "version": "1.0.0",
-  "description": "Example private widget built with React 19 and TypeScript: a live, self-updating counter with a React settings form, driven by @serviceware/portal-widget-sdk.",
+  "description": "Example private widget built with React 19 and TypeScript: a live, self-updating counter with a React settings form, driven by @serviceware-oss/portal-widget-sdk.",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -19,8 +19,8 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@serviceware/portal-widget-cli": "link:../../packages/cli",
-    "@serviceware/portal-widget-sdk": "link:../../packages/sdk",
+    "@serviceware-oss/portal-widget-cli": "link:../../packages/cli",
+    "@serviceware-oss/portal-widget-sdk": "link:../../packages/sdk",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "esbuild": "^0.28.2",

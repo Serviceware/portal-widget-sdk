@@ -1,36 +1,76 @@
-# Publishes with changesets + npm provenance. Requires:
-#  - npm trusted publishing (OIDC) configured for both packages, or NPM_TOKEN secret
-#  - publish rights on the @serviceware npm organisation (see docs/plan.md, decision 1)
-name: Release
+# Publishes @serviceware-oss/* to npmjs.com. Triggered by hand, from the Actions
+# tab, after the version bumps and the release tag are pushed.
+#
+# The release is prepared entirely on your machine: changeset, version bump, tag,
+# push. This workflow only builds and publishes, and it publishes the tag you
+# name when you start it — never "whatever is on main right now". The tag is a
+# required input, and it is resolved as `refs/tags/<tag>`, so a branch name or a
+# bare SHA will not check out.
+#
+# No npm token exists anywhere: not in a repo secret, not in the npm account.
+# Authentication is npm Trusted Publishing (OIDC), which npmjs.com binds to this
+# repository, this workflow filename (`release.yml`) and the `release`
+# environment. That binding is enforced by the registry, so copying this job into
+# another workflow file does not get you a publish.
+#
+# One-time setup this file depends on: docs/releasing.md.
+
+name: release
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish, e.g. v0.1.0 (must already be pushed)"
+        required: true
+        type: string
 
-permissions:
-  contents: write
-  pull-requests: write
-  id-token: write
+permissions: {}
 
 jobs:
   release:
+    name: Publish to npmjs.com
     runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      # `refs/tags/` is deliberate: it fails on a branch name or a bare SHA, so
+      # only something you tagged and pushed can be published.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+          ref: refs/tags/${{ inputs.tag }}
+
+      # The tag goes through env, not straight into the script: a workflow input
+      # interpolated into `run:` is a shell-injection sink.
+      - name: What is being released
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          echo "tag:    $TAG"
+          echo "commit: $(git rev-parse HEAD)"
+          echo "sdk:    $(node -p "require('./packages/sdk/package.json').version")"
+          echo "cli:    $(node -p "require('./packages/cli/package.json').version")"
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      # Node 24 for its npm: trusted publishing needs npm >= 11.5.1.
+      # CI already verifies the packages on .nvmrc.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version-file: .nvmrc
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - uses: changesets/action@v1
-        with:
-          publish: pnpm changeset publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
+
+      # Named explicitly, not globbed: a new directory under packages/ is only
+      # ever published because someone added it here on purpose. Both packages
+      # are a fixed version group (.changeset/config.json), so every release
+      # bumps both and neither is ever already on the registry.
+      - name: Publish
+        run: |
+          npm publish ./packages/sdk --access public --provenance
+          npm publish ./packages/cli --access public --provenance

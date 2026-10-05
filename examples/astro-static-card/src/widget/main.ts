@@ -3,7 +3,7 @@
  * rendered at build time, picks the language variant, shows the settings button when the Portal asks
  * for it, and forwards a few clicks to the Portal (router navigation, closing the settings dialog).
  */
-import { definePortalWidget, navigate, type WidgetContext } from '@serviceware/portal-widget-sdk';
+import { definePortalWidget, navigate, type WidgetContext } from '@serviceware-oss/portal-widget-sdk';
 import pages from 'virtual:astro-pages';
 import styles from 'virtual:astro-styles';
 

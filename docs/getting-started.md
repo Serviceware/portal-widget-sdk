@@ -11,8 +11,8 @@ repeating them. The complete worked example is
 
 - Node 20 or newer and a package manager (npm, pnpm or yarn).
 - A Portal 3.x with the `private-widgets` feature flag enabled and an administrator account.
-- The two packages from npm: `@serviceware/portal-widget-sdk` (runtime, a regular dependency of your widget)
-  and `@serviceware/portal-widget-cli` (a dev dependency, or run ad hoc with `npx`). Inside this repository
+- The two packages from npm: `@serviceware-oss/portal-widget-sdk` (runtime, a regular dependency of your widget)
+  and `@serviceware-oss/portal-widget-cli` (a dev dependency, or run ad hoc with `npx`). Inside this repository
   the examples link to the local packages (`link:../../packages/*`) and each is its own pnpm project: run
   `pnpm install` and `pnpm build` at the root first, then `pnpm install` inside the example folder.
 
@@ -42,7 +42,7 @@ Run the CLI wizard and choose the **custom** path. It asks for a display name an
 `portal-widget.json` with a derived tag and the paths where your bundles must land:
 
 ```bash
-npx @serviceware/portal-widget-cli          # or `npx portal-widget` once it is a dev dependency
+npx @serviceware-oss/portal-widget-cli          # or `npx portal-widget` once it is a dev dependency
 ? Widget type: custom
 ? Display name: My Widget
 -> portal-widget.json  (tagName ssp-my-widget, bundles/ssp-my-widget-1.0.0-{full,light}.js)
@@ -58,7 +58,7 @@ resolves bundle files from the tag, [backend-findings.md](backend-findings.md) s
 Minimal `src/main.ts`:
 
 ```ts
-import { defineConfigSchema, definePortalWidget, withDefaults } from '@serviceware/portal-widget-sdk';
+import { defineConfigSchema, definePortalWidget, withDefaults } from '@serviceware-oss/portal-widget-sdk';
 import styles from './styles.css'; // build.mjs inlines this as a string
 
 interface Settings { greeting: string; apiKey: string }

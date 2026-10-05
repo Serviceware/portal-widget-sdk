@@ -32,7 +32,7 @@ Everything under `libs/create-widget/` in SSP_Portal, and where it landed here.
 | `src/cli/index.ts` | `packages/cli/src/cli/main.ts` | CommonJS self-run block removed; `src/bin.ts` (new) is the shebang entry and calls `main()`. `new` command removed (scaffold not ported). |
 | `src/cli/embed-bundle-resolver.ts` | `packages/cli/src/cli/embed-bundle-resolver.ts` | Resolves `assets/embed/ng<major>` from `PACKAGE_ROOT` instead of `__dirname/../..`. |
 | `src/index.ts` | `packages/cli/src/index.ts` | `scaffold` export removed. |
-| `src/lib/package-identity.ts` | `packages/cli/src/lib/package-identity.ts` | Package name `@serviceware/portal-widget-cli`, bin `portal-widget`, config file `portal-widget.json`, ZIP sidecar `portal-widget.json.txt` (were `ssp-widget*`). |
+| `src/lib/package-identity.ts` | `packages/cli/src/lib/package-identity.ts` | Package name `@serviceware-oss/portal-widget-cli`, bin `portal-widget`, config file `portal-widget.json`, ZIP sidecar `portal-widget.json.txt` (were `ssp-widget*`). |
 | `src/lib/wizard.ts` | `packages/cli/src/lib/wizard.ts` | Custom branch no longer scaffolds a project; it writes a `template: "custom"` config with `angularVersion: 0` and bundle paths under `bundles/`, then tells the author to build and `pack`. |
 | `src/lib/output.ts` | `packages/cli/src/lib/output.ts` | `wizard-custom` message reworded for the above (config path, both bundle paths, tag to register). |
 | `src/lib/{config,metadata,pack,prelude,rules,slugify,unpack,validate}.ts` | `packages/cli/src/lib/` | Unchanged (one comment in `rules.ts` reworded). |

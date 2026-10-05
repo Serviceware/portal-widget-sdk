@@ -1,7 +1,7 @@
 # serviceware-logo-three
 
 The Serviceware icon extruded in 3D with [three.js](https://threejs.org/), packaged as a Portal private
-widget with `@serviceware/portal-widget-sdk`. It doubles as the SDK's end-to-end test: every runtime
+widget with `@serviceware-oss/portal-widget-sdk`. It doubles as the SDK's end-to-end test: every runtime
 feature is wired to a button, an input or a setting so it can be exercised in the dev harness and in a
 real Portal.
 

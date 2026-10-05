@@ -1,6 +1,6 @@
 # Examples
 
-End-to-end example widgets built with `@serviceware/portal-widget-sdk`. Each one builds its bundles with
+End-to-end example widgets built with `@serviceware-oss/portal-widget-sdk`. Each one builds its bundles with
 its own `build.mjs` (esbuild) and packs them with `portal-widget pack`.
 
 The examples are **not** part of the repository's pnpm workspace. Each folder is its own pnpm project

@@ -1,4 +1,4 @@
-# `@serviceware/portal-widget-cli` — command specification
+# `@serviceware-oss/portal-widget-cli` — command specification
 
 > **Status.** This document is the *target* design for a framework-agnostic CLI (`init`/`build`/`release`).
 > What `packages/cli` actually contains today is the working CLI ported from SSP_Portal's

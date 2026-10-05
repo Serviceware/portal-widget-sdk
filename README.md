@@ -10,14 +10,14 @@ Public, framework-agnostic toolkit for building **private widgets** for Servicew
 ## Packages
 
 ```bash
-npm install @serviceware/portal-widget-sdk          # runtime, in your widget project
-npx @serviceware/portal-widget-cli                  # wizard, pack, validate, unpack
+npm install @serviceware-oss/portal-widget-sdk          # runtime, in your widget project
+npx @serviceware-oss/portal-widget-cli                  # wizard, pack, validate, unpack
 ```
 
 | Package | Purpose | Runs in |
 |---|---|---|
-| [`@serviceware/portal-widget-sdk`](packages/sdk) | Tiny, zero-dependency runtime: talk to the Portal (toasts, config modal, navigation, skeleton, resize), read the element inputs the Portal sets, authenticated fetch against the Portal API. | Browser |
-| [`@serviceware/portal-widget-cli`](packages/cli) | `portal-widget` command line, ported from SSP_Portal: no-code **embed** wizard (name + URL in, import ZIP out), `pack` (embed, or your own bundles built with any framework), `validate`, `unpack`. Framework-agnostic `init`/`build` are still design only (`docs/cli.md`). | Node ≥ 20 |
+| [`@serviceware-oss/portal-widget-sdk`](packages/sdk) | Tiny, zero-dependency runtime: talk to the Portal (toasts, config modal, navigation, skeleton, resize), read the element inputs the Portal sets, authenticated fetch against the Portal API. | Browser |
+| [`@serviceware-oss/portal-widget-cli`](packages/cli) | `portal-widget` command line, ported from SSP_Portal: no-code **embed** wizard (name + URL in, import ZIP out), `pack` (embed, or your own bundles built with any framework), `validate`, `unpack`. Framework-agnostic `init`/`build` are still design only (`docs/cli.md`). | Node ≥ 20 |
 
 Both are released from this repository with [changesets](.changeset) and published with npm provenance
 by `.github/workflows/release.yml`.
@@ -39,8 +39,8 @@ Install it whichever way suits your agent:
 
 ```bash
 # Any agent, pinned to the CLI version you use (recommended once the packages are on npm)
-npx @serviceware/portal-widget-cli skill install            # -> .claude/skills and .agents/skills
-npx @serviceware/portal-widget-cli skill install --global   # into your home directory instead
+npx @serviceware-oss/portal-widget-cli skill install            # -> .claude/skills and .agents/skills
+npx @serviceware-oss/portal-widget-cli skill install --global   # into your home directory instead
 
 # Any agent, straight from GitHub (github.com/vercel-labs/skills)
 npx skills add Serviceware/portal-widget-sdk --skill portal-private-widget
@@ -116,8 +116,10 @@ The examples under `examples/` are deliberately kept out of the root pnpm worksp
 lockfile). Run `pnpm install` inside an example folder, or `pnpm install:examples` at the root, when you
 want to work on one.
 
-Releases: every user-facing change adds a changeset (`pnpm changeset`). On push to `main` the release
-workflow opens or updates a "Version Packages" pull request; merging it publishes the bumped packages to npm.
+Releases are prepared locally: `pnpm changeset`, then `pnpm version-packages`, then commit, tag and
+`git push --follow-tags`. Publishing is the **Release** workflow, run by hand from the Actions tab with
+the tag as its input. Both packages are a fixed version group, so they always share a version and ship
+together. See [docs/releasing.md](docs/releasing.md).
 
 Tooling decisions (TypeScript, tsup, vitest, changesets, npm provenance) are described in
 [docs/plan.md](docs/plan.md).

@@ -2,7 +2,7 @@
 
 A Portal private widget whose content is **rendered by [Astro](https://astro.build) at build time**. The
 bundle carries no framework runtime at all: Astro produces plain HTML and CSS, `build.mjs` folds them into
-the widget bundle, and a 60-line runtime on `@serviceware/portal-widget-sdk` mounts the right language
+the widget bundle, and a 60-line runtime on `@serviceware-oss/portal-widget-sdk` mounts the right language
 variant and forwards a few clicks to the Portal. It is the opposite end of the spectrum from the React
 example: static content, zero client-side framework.
 

@@ -1,4 +1,4 @@
-import { defineConfigSchema } from '@serviceware/portal-widget-sdk';
+import { defineConfigSchema } from '@serviceware-oss/portal-widget-sdk';
 
 /** Saved in `configuration.customConfig`; visible to every visitor of the page. */
 export interface CounterSettings {

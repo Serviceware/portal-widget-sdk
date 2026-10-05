@@ -7,7 +7,7 @@
  * sets a property.
  */
 import { createContext, useContext, useMemo, useSyncExternalStore } from 'react';
-import { withDefaults, type PortalWidgetInputs, type WidgetContext } from '@serviceware/portal-widget-sdk';
+import { withDefaults, type PortalWidgetInputs, type WidgetContext } from '@serviceware-oss/portal-widget-sdk';
 import { translator, type Translate } from './i18n';
 import { CounterSettings, sanitize, schema } from './schema';
 

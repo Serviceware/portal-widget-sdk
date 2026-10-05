@@ -1,4 +1,4 @@
-import { SecretInConfigError, withDefaults, type PortalWidgetInputs, type WidgetContext } from '@serviceware/portal-widget-sdk';
+import { SecretInConfigError, withDefaults, type PortalWidgetInputs, type WidgetContext } from '@serviceware-oss/portal-widget-sdk';
 import { button, h, type MountedView } from './dom';
 import { pickOverrides, Translator } from './i18n';
 import { LogoSettings, safeColor, schema } from './schema';

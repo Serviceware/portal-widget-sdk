@@ -1,6 +1,6 @@
 # react-live-counter
 
-A Portal private widget written with **React 19 and TypeScript** on `@serviceware/portal-widget-sdk`. It
+A Portal private widget written with **React 19 and TypeScript** on `@serviceware-oss/portal-widget-sdk`. It
 is deliberately a *changing* widget: a counter that ticks on its own, a clock, a progress bar towards a
 configurable target, and a React settings form for the Portal's settings dialog. Use it to see how a
 component framework with its own state and render cycle sits on top of the SDK's plain-DOM contract.

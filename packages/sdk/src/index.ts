@@ -1,5 +1,5 @@
 /**
- * @serviceware/portal-widget-sdk
+ * @serviceware-oss/portal-widget-sdk
  *
  * Zero-dependency runtime for Serviceware Portal private widgets.
  * Specification: docs/sdk.md. Contract: docs/contract.md.

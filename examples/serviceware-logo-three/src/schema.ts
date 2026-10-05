@@ -1,4 +1,4 @@
-import { defineConfigSchema } from '@serviceware/portal-widget-sdk';
+import { defineConfigSchema } from '@serviceware-oss/portal-widget-sdk';
 import { ICON_FILL } from './logo-svg';
 
 /** Saved in `configuration.customConfig`; visible to every visitor of the page. */

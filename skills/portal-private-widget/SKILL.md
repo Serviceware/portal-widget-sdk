@@ -1,14 +1,14 @@
 ---
 name: portal-private-widget
-description: Build, test and package a private widget for Serviceware Portal 3.x with @serviceware/portal-widget-sdk and @serviceware/portal-widget-cli. Use when asked to create, scaffold, port, fix, build, pack or import a Portal widget, custom element or "private widget", produce the Portal import ZIP, or embed a URL as a Portal widget tile. Covers vanilla TS, React, Vue, Lit, Svelte and pre-rendered (Astro) widgets.
+description: Build, test and package a private widget for Serviceware Portal 3.x with @serviceware-oss/portal-widget-sdk and @serviceware-oss/portal-widget-cli. Use when asked to create, scaffold, port, fix, build, pack or import a Portal widget, custom element or "private widget", produce the Portal import ZIP, or embed a URL as a Portal widget tile. Covers vanilla TS, React, Vue, Lit, Svelte and pre-rendered (Astro) widgets.
 ---
 
 # Serviceware Portal private widget
 
 A private widget is **one classic JavaScript file that calls `customElements.define('<tag>', …)`**. The
 Portal loads it into its own page (no iframe), creates `<tag>` in its grid, sets properties on it and talks
-to it through DOM events. `@serviceware/portal-widget-sdk` (browser, zero deps) wraps that contract.
-`@serviceware/portal-widget-cli` (bin `portal-widget`, Node ≥ 20) turns `portal-widget.json` plus the two
+to it through DOM events. `@serviceware-oss/portal-widget-sdk` (browser, zero deps) wraps that contract.
+`@serviceware-oss/portal-widget-cli` (bin `portal-widget`, Node ≥ 20) turns `portal-widget.json` plus the two
 bundle files into the ZIP an administrator imports. If anything here disagrees with
 [`docs/contract.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/contract.md), the
 contract wins.
@@ -22,7 +22,7 @@ Ask only if it is genuinely unclear. Default to custom with vanilla TypeScript, 
 
 ## 2. Get the packages
 
-Run `npm view @serviceware/portal-widget-sdk version`.
+Run `npm view @serviceware-oss/portal-widget-sdk version`.
 
 - **Published**: use the `package.json` below as is, run `npm install`, then pin the installed versions.
 - **404 (not published)**: you need a built checkout of `github.com/Serviceware/portal-widget-sdk`. If one
@@ -61,8 +61,8 @@ and the CLI then rejects the file as malformed). `.gitignore`: `node_modules/`, 
     "validate": "portal-widget validate portal-widget.json",
     "pack:widget": "portal-widget pack"
   },
-  "dependencies": { "@serviceware/portal-widget-sdk": "latest" },
-  "devDependencies": { "@serviceware/portal-widget-cli": "latest", "esbuild": "^0.28.2", "typescript": "^5.6.0" }
+  "dependencies": { "@serviceware-oss/portal-widget-sdk": "latest" },
+  "devDependencies": { "@serviceware-oss/portal-widget-cli": "latest", "esbuild": "^0.28.2", "typescript": "^5.6.0" }
 }
 ```
 
@@ -182,7 +182,7 @@ console.log(`[${tag}] bundles written (css: ${cssMode})`);
 `src/main.ts` (a tile plus the settings form the Portal shows in its dialog):
 
 ```ts
-import { defineConfigSchema, definePortalWidget, withDefaults, type WidgetContext } from '@serviceware/portal-widget-sdk';
+import { defineConfigSchema, definePortalWidget, withDefaults, type WidgetContext } from '@serviceware-oss/portal-widget-sdk';
 import styles from './styles.css';
 
 interface Settings { title: string }

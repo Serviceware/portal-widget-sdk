@@ -8,7 +8,7 @@
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { definePortalWidget } from '@serviceware/portal-widget-sdk';
+import { definePortalWidget } from '@serviceware-oss/portal-widget-sdk';
 import { App } from './App';
 import { createPortalStore, PortalStoreProvider, type PortalStore } from './portal-store';
 import { CounterSettings, schema } from './schema';

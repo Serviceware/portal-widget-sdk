@@ -203,7 +203,7 @@ const widgetOptions = {
     legalComments: 'eof',
     outfile: fullBundle,
     define,
-    banner: { js: `/* ${tag} ${version} | css: ${cssMode} | Astro + @serviceware/portal-widget-sdk */` },
+    banner: { js: `/* ${tag} ${version} | css: ${cssMode} | Astro + @serviceware-oss/portal-widget-sdk */` },
     plugins: [astroPlugin, finishPlugin],
     logLevel: 'info'
 };

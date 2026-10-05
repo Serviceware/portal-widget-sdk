@@ -19,10 +19,10 @@
 
 ## Open decisions (owner: Portal team)
 
-1. ~~npm scope~~ **Confirmed: `@serviceware`.** ~~GitHub organisation~~ **Confirmed:
-   `github.com/Serviceware/portal-widget-sdk`.** Still open: who administers the npm organisation. The first
-   publish needs an `NPM_TOKEN` secret with publish rights on the scope; npm trusted publishing (OIDC) can
-   only be switched on per package after it exists on the registry (release.yml supports both).
+1. ~~npm scope~~ **Confirmed: `@serviceware-oss`.** ~~GitHub organisation~~ **Confirmed:
+   `github.com/Serviceware/portal-widget-sdk`.** Still open: who administers the npm organisation. npm
+   trusted publishing (OIDC) can only be switched on per package after it exists on the registry, so each
+   name needs one manual bootstrap publish; after that no token exists anywhere. See docs/releasing.md.
 2. ~~Service connection proxy exists?~~ **Answered: no usable proxy** (backend-findings.md §1). Decide
    whether to build the proxy (§4) before or after SDK v1. SDK v1 ships without Tier 1 either way.
 3. ~~Header values returned to the browser?~~ **Answered: yes, to anonymous visitors**
@@ -39,7 +39,7 @@
 - PBI (feature): widget-facing service-connection proxy that injects stored headers server-side.
 - PBI (robustness): private widget storage paths derived from metadata; validate tag/file names on upload.
 - PBI: shadow-DOM-aware widget compliance probe.
-- PBI: contract drift spec in SSP_Portal importing `@serviceware/portal-widget-sdk/contract` and asserting
+- PBI: contract drift spec in SSP_Portal importing `@serviceware-oss/portal-widget-sdk/contract` and asserting
   `Events` enum + `EventManager` suffix + element I/O names; plus `widget-package.service.spec.ts` case
   that unpacks a zip fixture produced by the CLI.
 - Docs: link the SDK from `libs/utils/docs/index.md` for external (non-Angular) authors.
@@ -80,9 +80,10 @@
       and shadow CSS builds, Portal-mock dev harness with a copy of the compliance probe
 - [ ] manual run: build → pack → import in Portal admin on localhost:4200 → toast + config modal work,
       no `[Widget Compliance]` warning, Portal styles unchanged
-- [ ] publish `0.1.0` of both packages: merge the "Version Packages" PR that release.yml opens once
-      `NPM_TOKEN` is configured. Both tarballs were install-tested from `pnpm pack` output (CJS, ESM,
-      `/contract` subpath, `portal-widget` bin) and pass publint and arethetypeswrong.
+- [ ] publish `0.1.0` of both packages: bootstrap each name on npm, configure its trusted publisher,
+      then locally `pnpm version-packages`, commit, tag, `git push --follow-tags`, and run the Release
+      workflow by hand with that tag (docs/releasing.md). Both tarballs were install-tested from `pnpm pack` output
+      (CJS, ESM, `/contract` subpath, `portal-widget` bin) and pass publint and arethetypeswrong.
 
 ### Phase 4 — Portal side
 - [ ] contract drift spec PR in SSP_Portal

@@ -124,7 +124,7 @@ const widgetOptions = {
     legalComments: 'eof',
     outfile: fullBundle,
     define,
-    banner: { js: `/* ${tag} ${version} | css: ${cssMode} | built with @serviceware/portal-widget-sdk */` },
+    banner: { js: `/* ${tag} ${version} | css: ${cssMode} | built with @serviceware-oss/portal-widget-sdk */` },
     plugins: [cssPlugin, finishPlugin],
     logLevel: 'info'
 };

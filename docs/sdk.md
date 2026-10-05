@@ -1,9 +1,9 @@
-# `@serviceware/portal-widget-sdk` — runtime API specification
+# `@serviceware-oss/portal-widget-sdk` — runtime API specification
 
 Browser only. Zero runtime dependencies. ESM + CJS + `.d.ts`. Target ES2020. Size budget: **< 6 kB
 minified, < 2.5 kB gzip** for the full entry; every function tree-shakeable.
 
-npm scope: `@serviceware` (confirmed).
+npm scope: `@serviceware-oss` (confirmed).
 
 > **No secure third-party authentication in v1.** A widget cannot use a private API key or credential
 > safely: everything in the browser is visible to the visitor, and the Portal has no server-side proxy for
@@ -19,8 +19,8 @@ npm scope: `@serviceware` (confirmed).
 ## Entry points
 
 ```ts
-import { … } from '@serviceware/portal-widget-sdk';          // everything
-import { … } from '@serviceware/portal-widget-sdk/contract'; // constants and types only
+import { … } from '@serviceware-oss/portal-widget-sdk';          // everything
+import { … } from '@serviceware-oss/portal-widget-sdk/contract'; // constants and types only
 ```
 
 ---

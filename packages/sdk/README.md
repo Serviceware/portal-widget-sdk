@@ -1,9 +1,9 @@
-# @serviceware/portal-widget-sdk
+# @serviceware-oss/portal-widget-sdk
 
 Zero-dependency runtime for building Serviceware Portal **private widgets** with any framework.
 
 ```bash
-npm install @serviceware/portal-widget-sdk
+npm install @serviceware-oss/portal-widget-sdk
 ```
 
 ESM and CommonJS builds with type declarations. Browser only, no framework imports, works with vanilla TS,
@@ -22,7 +22,7 @@ React, Vue, Lit, Svelte or Angular.
 ## Usage
 
 ```ts
-import { definePortalWidget, defineConfigSchema } from '@serviceware/portal-widget-sdk';
+import { definePortalWidget, defineConfigSchema } from '@serviceware-oss/portal-widget-sdk';
 import styles from './styles.css'; // a CSS string; see the example's build.mjs for light-mode scoping
 
 const schema = defineConfigSchema<{ greeting: string }>({

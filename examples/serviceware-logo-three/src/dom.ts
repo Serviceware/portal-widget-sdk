@@ -1,4 +1,4 @@
-import type { PortalWidgetInputs } from '@serviceware/portal-widget-sdk';
+import type { PortalWidgetInputs } from '@serviceware-oss/portal-widget-sdk';
 import type { LogoSettings } from './schema';
 
 /** What `main.ts` keeps per element: the mounted view for the current mode (widget or settings). */

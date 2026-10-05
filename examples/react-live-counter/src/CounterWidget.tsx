@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import type { WidgetSize } from '@serviceware/portal-widget-sdk';
+import type { WidgetSize } from '@serviceware-oss/portal-widget-sdk';
 import { useInputs, usePortal, useSettings, useTranslate } from './portal-store';
 
 /** Re-renders once per `everyMs` while `active`; returns the current time. */
