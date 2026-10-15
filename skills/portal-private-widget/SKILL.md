@@ -265,6 +265,7 @@ What `ctx` offers:
 | Open the settings dialog | `ctx.openSettings()`; show the trigger only if `showSettingsButton` |
 | Toasts | `ctx.toast.success / info / warning / error(detail, summary?)` |
 | Portal API as the current user | `ctx.fetch(`${ctx.inputs.apiUrl}/…`)`: bearer token only for `apiUrl` URLs |
+| Third-party API with a credential | `ctx.service(connectionId)(path)` through a linked Service Connection (section 6); `ctx.serviceConnections()` lists the linked ones |
 | Uploaded translations | `await ctx.loadTranslations(ctx.inputs.language)` |
 | Grid resize | `ctx.onResize(({ width, height }) => …)` |
 | Navigation, skeleton | `navigate(route, query?)`, `showSkeleton(id)`, `hideSkeleton(id)` from the package root |
@@ -302,15 +303,26 @@ compliance probe requires.
   `SecretInConfigError` if they are non-empty.
 - `authToken` is the user's Portal session. Only send it to `apiUrl` (via `ctx.fetch`); never forward or
   store it.
-- **No released Portal can call a third-party API with a private key securely** (there's no Service
-  Connection proxy in production). Tell the user plainly. An **experimental** `ctx.service('<connection
-  name>')(path)` exists for Portals running the backend proof of concept (`poc/widget-connection-proxy`,
-  docs/service-connection-proxy.md). The admin stores the key in a Service Connection. The widget's settings view
-  lists connections via `ctx.fetch('api/v2/admin/serviceconnections')` and links the chosen one with
-  `ctx.save(customConfig, { serviceConnectionsId: [id] })`; `customConfig` holds only the id. Offer it only if the user confirms their Portal has
-  that backend, and never as a production solution. The options are a key that is public by design and referrer-restricted
-  (can go in `customConfig`, documented as public), or their own backend that holds the key and validates the
-  forwarded Portal token.
+- **Private keys go into a Portal Service Connection, never into the widget** — not into `customConfig`, not
+  into a `secret: true` field, not into the bundle. Needs Portal 3 with the Service Connection proxy; ask the
+  user whether their Portal has it. If yes:
+  - The admin creates the connection (base URL + mode: `Custom` = API key header or query parameter,
+    `BearerToken`, `Basic`, `OAuth2ClientCredentials`, `ForwardUserToken` = the user's Portal token) and
+    links it to the widget instance in the widget settings.
+  - The widget's settings view lists candidates via `ctx.fetch('api/v2/admin/serviceconnections')` (admin
+    only) and saves with `ctx.save(customConfig, { serviceConnectionsId: [id] })`; `customConfig` holds only
+    the connection id.
+  - The widget calls `await ctx.service(id)(path, init)` (path relative to the connection URL). The
+    `Response` comes back unchanged: handle non-2xx (`401`, `404`, `429` + `Retry-After`, `502`, `504`, or
+    upstream statuses) with a neutral message; never retry in a loop. `ServiceConnectionNotFoundError` means
+    nothing is linked yet: tell the admin to link it in the settings.
+  - `ctx.serviceConnections()` gives `{ id, name, module, mode, modeName, isDefault, hasCredentials,
+    allowAnonymous, url }` without any secret. Never read or display `configuration.serviceConnections[].security`
+    values.
+  - On anonymous pages it works only for connections the admin marked *allow anonymous*.
+  Without the proxy, tell the user plainly there is no secure browser-side option: use a key that is public by
+  design and referrer-restricted (can go in `customConfig`, documented as public), or their own backend that
+  holds the key and validates the forwarded Portal token.
 - No `.env` files, no source maps, bundles < 10 MB.
 
 ## 7. Build, validate, pack

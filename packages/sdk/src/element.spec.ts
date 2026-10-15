@@ -195,6 +195,59 @@ describe('definePortalWidget', () => {
         expect(saved[1]!.detail.serviceConnectionsId).toEqual(['sc-1', 'sc-2']);
     });
 
+    it('serviceConnections() and service() work for the linked connections, also without a token', async () => {
+        const tag = nextTag();
+        let ctx!: WidgetContext<Partial<Settings>>;
+        definePortalWidget<Partial<Settings>>({ tag, configSchema: schema, render: c => void (ctx = c) });
+        const requests: Request[] = [];
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(async (request: Request) => {
+                requests.push(request);
+                return new Response('{}');
+            })
+        );
+
+        const element = document.createElement(tag) as Inputs;
+        element.apiUrl = 'https://portal.example.com/api-gateway';
+        element.authToken = '';
+        element.configuration = {
+            ...makeConfig({}),
+            serviceConnectionsId: ['sc-1'],
+            serviceConnections: [
+                {
+                    id: 'sc-1',
+                    name: 'weather',
+                    module: 'portal',
+                    url: null,
+                    isDefault: false,
+                    security: { mode: 2, headers: [{ key: 'x-api-key', value: '********' }], allowAnonymous: true }
+                }
+            ]
+        };
+        document.body.appendChild(element);
+        await flush();
+
+        expect(ctx.serviceConnections()).toEqual([
+            {
+                id: 'sc-1',
+                name: 'weather',
+                module: 'portal',
+                mode: 2,
+                modeName: 'Custom',
+                isDefault: false,
+                hasCredentials: true,
+                allowAnonymous: true,
+                url: null
+            }
+        ]);
+
+        await ctx.service('weather')('today');
+        expect(requests[0]!.url).toBe('https://portal.example.com/api-gateway/api/v1/proxy/sc-1/today');
+        expect(requests[0]!.headers.has('authorization')).toBe(false);
+        expect(requests[0]!.headers.get('x-portal-widget-instance')).toBe('rw-1');
+    });
+
     it('cancel() and openSettings() dispatch the contract events', async () => {
         const tag = nextTag();
         let ctx!: WidgetContext<Partial<Settings>>;

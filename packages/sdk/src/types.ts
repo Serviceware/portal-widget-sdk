@@ -72,25 +72,60 @@ export interface UserProfile {
     [extra: string]: unknown;
 }
 
-export const SecurityModes = { None: 0, BearerToken: 1, Custom: 2 } as const;
-export type SecurityMode = (typeof SecurityModes)[keyof typeof SecurityModes];
+/** How the Portal authenticates a Service Connection against the third party (docs/contract.md §5a). */
+export const SecurityModes = {
+    /** Nothing is added. */
+    None: 0,
+    /** One `Authorization: Bearer …` header. */
+    BearerToken: 1,
+    /** Custom headers and query parameters, e.g. an API key header. */
+    Custom: 2,
+    /** `Authorization: Basic …` from a stored username and password. */
+    Basic: 3,
+    /** Bearer token the Portal fetches with the OAuth 2.0 client credentials grant. */
+    OAuth2ClientCredentials: 4,
+    /** The caller's Portal access token is forwarded (logged-in users only). */
+    ForwardUserToken: 5
+} as const;
+export type SecurityModeName = keyof typeof SecurityModes;
+export type SecurityMode = (typeof SecurityModes)[SecurityModeName];
 
+/** A header or query parameter of a Service Connection. The Portal always returns `value` as `"********"`. */
+export interface ServiceConnectionKeyValue {
+    key: string;
+    value: string;
+}
+
+/**
+ * Security settings of a Service Connection, as the Portal returns them. Every secret value (header and
+ * query values, `basic.password`, `oAuth2.clientSecret`) is masked as `"********"` on every read; empty
+ * means "not set". Do not read or display the masks: use `listServiceConnections()` instead.
+ */
 export interface ServiceConnectionSecurity {
     mode: SecurityMode;
-    /**
-     * Header values must never be exposed to the browser. A Portal with the Service Connection proxy
-     * returns every value as `"********"`; older Portals leak the real value. See docs/security.md.
-     */
-    headers?: { key: string; value: string }[];
+    headers?: ServiceConnectionKeyValue[] | null;
+    queryParameters?: ServiceConnectionKeyValue[] | null;
+    basic?: { username: string; password: string } | null;
+    oAuth2?: {
+        tokenUrl: string;
+        clientId: string;
+        clientSecret: string;
+        scope?: string | null;
+        audience?: string | null;
+    } | null;
+    /** The proxy may be used from anonymous (public) pages. Never true for `ForwardUserToken`. */
+    allowAnonymous?: boolean;
 }
 
 export interface ServiceConnection {
     id: string;
     name: string;
     module: string;
-    url: string;
+    /** Base URL of the third-party API. `null` for anonymous callers when the connection carries credentials. */
+    url: string | null;
     security?: ServiceConnectionSecurity;
     isDefault: boolean;
+    websiteId?: number | string;
 }
 
 /** Per-language translation overrides: `{ en: { key: 'text' } }` */

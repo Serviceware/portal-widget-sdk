@@ -23,10 +23,11 @@
    `github.com/Serviceware/portal-widget-sdk`.** Still open: who administers the npm organisation. npm
    trusted publishing (OIDC) can only be switched on per package after it exists on the registry, so each
    name needs one manual bootstrap publish; after that no token exists anywhere. See docs/releasing.md.
-2. ~~Service connection proxy exists?~~ **Answered: no usable proxy** (backend-findings.md §1). Decide
-   whether to build the proxy (§4) before or after SDK v1. SDK v1 ships without Tier 1 either way.
+2. ~~Service connection proxy exists?~~ **Answered: built** as the Service Connection proxy in Portal 3
+   (contract.md §5a); the SDK supports it with `ctx.service`. Older Portals have no usable proxy
+   (backend-findings.md §1).
 3. ~~Header values returned to the browser?~~ **Answered: yes, to anonymous visitors**
-   (backend-findings.md §2). Backend fix needed regardless of the SDK.
+   (backend-findings.md §2). Fixed by the same Portal change (values masked on every read).
 4. **Shadow-aware compliance probe** in the Portal shell (css-isolation.md §5). Must land before the
    hard-fail switch (PBI 433384).
 5. **`publish` command** with admin token handling: ship or skip.
@@ -88,8 +89,8 @@
 ### Phase 4 — Portal side
 - [ ] contract drift spec PR in SSP_Portal
 - [ ] compliance probe PR
-- [ ] backend answers on proxy/redaction, then SDK `createServiceClient` (POC: backend branch
-  `poc/widget-connection-proxy`, experimental `ctx.service`; see service-connection-proxy.md)
+- [x] backend answers on proxy/redaction, then SDK `createServiceClient`: `ctx.service` and
+  `ctx.serviceConnections` for Portal 3 with the Service Connection proxy (service-connection-proxy.md)
 
 ### Later
 - Angular preset (port `webpack.externals.js`, `extra-webpack.config.js`, `elements-build-script.js`,

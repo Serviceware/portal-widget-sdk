@@ -9,11 +9,11 @@
     "description": [
         {
             "language": "en",
-            "value": "<p>Experimental. Calls a third-party API through a Portal Service Connection. The Portal injects the API key on the server, so it never reaches the browser.</p>"
+            "value": "<p>Calls a third-party API through a Portal Service Connection. The Portal injects the API key on the server, so it never reaches the browser.</p>"
         },
         {
             "language": "de",
-            "value": "<p>Experimentell. Ruft eine Fremd-API über eine Portal Service Connection auf. Das Portal setzt den API-Schlüssel auf dem Server ein, er erreicht den Browser nie.</p>"
+            "value": "<p>Ruft eine Fremd-API über eine Portal Service Connection auf. Das Portal setzt den API-Schlüssel auf dem Server ein, er erreicht den Browser nie.</p>"
         }
     ],
     "changes": [{ "language": "en", "value": "<p>Initial version.</p>" }],

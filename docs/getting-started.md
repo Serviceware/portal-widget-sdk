@@ -175,13 +175,14 @@ response in Chrome DevTools (Sources, Overrides) or use `dev-widgets.json` in a 
   credentials there. The `secret: true` schema flag makes `save()` throw if you try.
 - `authToken` is the current user's Portal session. `ctx.fetch` sends it to the Portal API only.
 - `userProfile` is personal data for the current user; render it, never persist or forward it.
-- **Service connections and API keys.** The Portal lets an administrator store third-party credentials
-  in a Service Connection and link it to a widget; `configuration.serviceConnections` lists them.
-  Today there is **no server-side proxy** that would inject those headers, and the Portal even returns the
-  header values to anonymous visitors ([backend-findings.md](backend-findings.md) sections 1 and 2). Until
-  the backend fixes land, a browser widget has no secure way to use a private API key. Options now:
-  keys that are public by design and restricted by referrer (maps, analytics), or your own backend that
-  holds the key and validates the Portal token. The SDK will add `createServiceClient` once the proxy exists.
+- **Service connections and API keys.** Private keys belong in a Portal Service Connection, never in
+  `customConfig` or a `secret: true` field. The admin stores the credential there and links the connection
+  in the widget settings; the widget keeps only the connection id and calls `ctx.service(id)(path)`. The
+  Portal adds the credential server-side. `ctx.serviceConnections()` lists the linked connections without
+  any secret value. This needs Portal 3 with the Service Connection proxy
+  ([service-connection-proxy.md](service-connection-proxy.md)). Without it, use keys that are public by
+  design and restricted by referrer (maps, analytics), or your own backend that holds the key and validates
+  the Portal token.
 
 ## 10. Using a framework
 

@@ -9,7 +9,7 @@ import { ELEMENT_INPUTS, ElementInputName, PRIVATE_WIDGET_VERSION, translationsP
 import { onWidgetResize, showConfiguration, toast, WidgetSize } from './events';
 import { createPortalFetch } from './fetch';
 import { cancelConfiguration, saveConfiguration } from './outputs';
-import { createServiceClient, ServiceFetch } from './service-client';
+import { createServiceClient, listServiceConnections, ServiceConnectionInfo, ServiceFetch } from './service-client';
 import type { ConfigSchema, PortalWidgetInputs, WidgetConfig } from './types';
 
 export type CssMode = 'shadow' | 'light';
@@ -23,10 +23,13 @@ export interface WidgetContext<T> {
     /** `fetch` that adds the Portal bearer token for `apiUrl` requests only. */
     readonly fetch: typeof fetch;
     /**
-     * EXPERIMENTAL. Fetch through a Service Connection linked to this instance, by id or name. The
-     * Portal injects the connection's credentials server-side; the widget never sees them.
+     * Fetch through a Service Connection linked to this instance, by id or name. The Portal adds the
+     * connection's credentials server-side; the widget never sees them. Needs Portal 3 with the
+     * Service Connection proxy.
      */
     service(connectionIdOrName: string): ServiceFetch;
+    /** Safe info (no secret or masked values) about the Service Connections linked to this instance. */
+    serviceConnections(): ServiceConnectionInfo[];
     readonly toast: typeof toast;
     /** Asks the Portal to open the settings dialog for this instance. */
     openSettings(): void;
@@ -206,6 +209,7 @@ export function definePortalWidget<T = Record<string, unknown>>(options: DefineP
                 fetch: portalFetch,
                 service: (connectionIdOrName: string): ServiceFetch =>
                     createServiceClient(() => ({ ...getAuth(), configuration: inputs.configuration }), connectionIdOrName),
+                serviceConnections: (): ServiceConnectionInfo[] => listServiceConnections(inputs.configuration),
                 toast,
                 openSettings: (): void => {
                     showConfiguration(inputs.configuration);

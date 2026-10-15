@@ -142,31 +142,86 @@ Other events exist in the Portal (`eventSwPortalLogin`, `eventSwPortalLogout`, `
     header `x-sw-language` tells which language was actually served. Private widgets' uploaded `<lang>.json`
     files are served here.
 
-### 5a. Service Connection proxy (EXPERIMENTAL, not in any released Portal)
+### 5a. Service Connection proxy
 
-Exists only on the backend POC branch; see [service-connection-proxy.md](service-connection-proxy.md).
+Requires Portal 3 with the Service Connection proxy. No Portal version number is assigned to it yet; on a
+Portal without it the endpoint answers 404. Background: [service-connection-proxy.md](service-connection-proxy.md).
 
 ```
 {GET|POST|PUT|PATCH|DELETE} {apiUrl}/api/v1/proxy/{connectionId}/{path}?{query}
-Authorization: Bearer <authToken>             required; stripped before the upstream call
+Authorization: Bearer <authToken>             only when the user is logged in; stripped before the upstream call
 X-Portal-Widget-Instance: <configuration.id>  required; the connection must be linked to this instance
 ```
 
-- The Portal forwards to `{serviceConnection.url}/{path}?{query}` with the connection's stored headers.
+- The Portal forwards to `{serviceConnection.url}/{path}?{query}` and adds the connection's credentials
+  server-side (see the modes below). Path segments are re-escaped, `.`/`..` are rejected, and the target must
+  stay under the connection URL. Redirects are not followed.
 - Only these request headers pass: `Accept`, `Accept-Language`, `Content-Type`, `Content-Language`,
-  `If-*`, `Range`.
+  `If-*`, `Range`. The caller's `Authorization`, cookies and `X-Forwarded-*` never reach the third party.
 - Only these response headers pass: `Content-Type`, `Content-Language`, `Content-Disposition`,
   `Content-Range`, `Accept-Ranges`, `Cache-Control`, `ETag`, `Last-Modified`, `Expires`, `Retry-After`,
-  plus `X-Content-Type-Options: nosniff`.
-- Errors: `400` for a missing or invalid instance header or a path escaping the base URL. `401` when not
-  logged in. `404` when the connection is unknown, belongs to another tenant or is not linked. `502` when
-  upstream is unreachable or the response exceeds 10 MB. `504` after 30 s.
-- On a Portal with the proxy, `configuration.serviceConnections[].security` is an object and every
-  `headers[].value` is `"********"`. Older Portals send `security` as a JSON string with real values.
-- **Linking a connection to an instance.** The widget's settings view sets `serviceConnectionsId` on the
-  configuration it emits with `configurationSaved`, and the Portal persists it. Only a backend with the POC
-  stores the link; older backends ignore the field. The settings view can list candidates with
-  `GET {apiUrl}/api/v2/admin/serviceconnections` (admin only, values masked).
+  plus `X-Content-Type-Options: nosniff`. `Cache-Control: private, no-store` is set unless upstream sends one.
+- **Who may call.** The connection and the route widget belong to the caller's tenant, the connection is
+  linked to that route widget, and:
+  - logged-in caller: the user may see the page the widget is on (overlay widgets without a page: any
+    logged-in user of the tenant);
+  - anonymous caller (no token): the connection has `security.allowAnonymous: true`, its mode is not
+    `ForwardUserToken`, and the page is visible anonymously. Anonymous calls are rate limited per client IP
+    and connection (default 60 per minute).
+  Anything else is one `404`, so ids cannot be probed.
+- **Status codes of the proxy itself** (`application/problem+json`; `SERVICE_PROXY_STATUS` in
+  `contract.ts`). Every other status, and these too when upstream sends them, passes through from the third
+  party.
+
+  | Status | Meaning |
+  |---|---|
+  | `400` | `X-Portal-Widget-Instance` missing or invalid, or the path escapes the connection URL |
+  | `401` | A Portal token was sent but is invalid or expired |
+  | `404` | Connection unknown, other tenant, not linked, or not allowed for this caller |
+  | `409` | Admin API only (masked value with nothing stored); never returned to widgets by the proxy |
+  | `429` | Anonymous rate limit; wait for `Retry-After` seconds |
+  | `502` | Upstream unreachable or refused, credential missing, or response over 10 MB |
+  | `504` | Upstream did not answer within 30 s |
+
+- **Limits** (`SERVICE_PROXY_LIMITS`): 30 s timeout, 10 MB request and response body, no WebSocket or SSE.
+
+#### Service Connection data the widget receives
+
+`configuration.serviceConnections[]` lists the connections linked to the instance:
+
+```ts
+{
+  id: string; name: string; module: string; isDefault: boolean; websiteId?: number | string;
+  url: string | null;   // null for anonymous callers when security.mode !== 0
+  security: {
+    mode: 0 | 1 | 2 | 3 | 4 | 5;
+    headers?: { key: string; value: '********' }[];
+    queryParameters?: { key: string; value: '********' }[];
+    allowAnonymous?: boolean;
+    // admin API only: basic { username, password }, oAuth2 { tokenUrl, clientId, clientSecret, scope, audience }
+  };
+}
+```
+
+| `mode` | Name | The Portal adds upstream |
+|---|---|---|
+| 0 | `None` | nothing |
+| 1 | `BearerToken` | one `Authorization: Bearer …` header |
+| 2 | `Custom` | `headers` and `queryParameters` (e.g. an API key header) |
+| 3 | `Basic` | `Authorization: Basic …` from a stored username and password |
+| 4 | `OAuth2ClientCredentials` | `Authorization: Bearer <token>` fetched with the client credentials grant and cached until shortly before expiry |
+| 5 | `ForwardUserToken` | the caller's Portal access token (logged-in callers only) |
+
+Every secret value is returned as `"********"` (`MASKED_SECRET_VALUE`) on every read, admin included. Portals
+without the proxy send `security` as a JSON string with real values; widgets must not read or show any
+value. `listServiceConnections()` / `ctx.serviceConnections()` return only id, name, module, mode, flags and
+url.
+
+**Linking a connection to an instance.** The admin links connections in the widget settings. The widget's
+settings view sets `serviceConnectionsId` on the configuration it emits with `configurationSaved`
+(`ctx.save(customConfig, { serviceConnectionsId })`), and the Portal persists it (`null`/absent keeps the
+current links; only ids of the tenant are stored). The settings view can list candidates with
+`GET {apiUrl}/api/v2/admin/serviceconnections` (admin only, values masked).
 
 ---
 

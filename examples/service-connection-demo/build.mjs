@@ -6,8 +6,9 @@
  *   node build.mjs --watch --serve      rebuild on change and serve the Portal mock on http://localhost:4204
  *
  * The dev server also mocks the Portal's Service Connection proxy (`/mock-api/api/v1/proxy/...`) with the
- * same rules as the backend POC: Portal token required, connection must be linked to the widget
- * instance, caller credentials dropped, the connection's API key injected server-side. The key lives
+ * rules of docs/contract.md section 5a: instance header required, connection must be linked to the widget
+ * instance, anonymous callers only for connections with `allowAnonymous` and rate limited (429 with
+ * Retry-After), caller credentials dropped, the connection's API key added server-side. The key lives
  * only in this Node process (DEMO_API_KEY), never in the page.
  */
 import * as esbuild from 'esbuild';
@@ -43,10 +44,47 @@ const harnessBundle = join(here, 'dev', 'harness.js');
 
 /** Must match dev/harness.ts. */
 const MOCK = {
-    connectionId: '5b0c7c0e-8f3a-4d7e-9d52-2f8f1c1d9a10',
     widgetInstanceId: 'c3a1b0f2-0000-4000-8000-000000000001',
-    apiKey: process.env.DEMO_API_KEY || 'demo-key-kept-on-the-server'
+    apiKey: process.env.DEMO_API_KEY || 'demo-key-kept-on-the-server',
+    /** Anonymous calls per minute, per client IP and connection. Low on purpose so the 429 is easy to see. */
+    anonymousLimitPerMinute: 5,
+    /** The connections as the admin API returns them: every secret value masked. */
+    connections: [
+        {
+            id: '5b0c7c0e-8f3a-4d7e-9d52-2f8f1c1d9a10',
+            name: 'weather',
+            module: 'portal',
+            url: 'https://api.weather.example/v1',
+            isDefault: false,
+            security: { mode: 2, headers: [{ key: 'x-api-key', value: '********' }], allowAnonymous: false }
+        },
+        {
+            id: '7d2e9f14-3b6a-4c1d-8e0f-5a9b2c4d6e81',
+            name: 'public-weather',
+            module: 'portal',
+            url: 'https://api.weather.example/v1',
+            isDefault: false,
+            security: { mode: 2, headers: [{ key: 'x-api-key', value: '********' }], allowAnonymous: true }
+        }
+    ]
 };
+
+/** Anonymous call timestamps per `${ip}|${connectionId}`. */
+const anonymousCalls = new Map();
+
+/** Returns the seconds to wait, or 0 when the anonymous call is allowed. */
+function anonymousRetryAfter(ip, connectionId) {
+    const now = Date.now();
+    const key = `${ip}|${connectionId}`;
+    const recent = (anonymousCalls.get(key) ?? []).filter(time => now - time < 60_000);
+    if (recent.length >= MOCK.anonymousLimitPerMinute) {
+        anonymousCalls.set(key, recent);
+        return Math.max(1, Math.ceil((recent[0] + 60_000 - now) / 1000));
+    }
+    recent.push(now);
+    anonymousCalls.set(key, recent);
+    return 0;
+}
 
 /**
  * Light-mode CSS isolation (docs/css-isolation.md section 3, steps 4 and 5) for a flat stylesheet:
@@ -191,26 +229,41 @@ function mockUpstream(method, path, query, headers) {
     };
 }
 
-/** Mirrors ServiceConnectionProxyController + ServiceConnectionProxyForwarder in the backend POC. */
+function sendProblem(res, status, title, headers = {}) {
+    res.writeHead(status, { 'content-type': 'application/problem+json; charset=utf-8', ...headers });
+    res.end(JSON.stringify({ status, title }));
+}
+
+/** Mirrors the Portal's proxy rules (docs/contract.md section 5a). */
 function mockProxy(req, res, url, rest) {
     const [connectionId, ...segments] = rest.split('/');
-    if (!/^Bearer .+/.test(req.headers.authorization ?? '')) {
-        sendJson(res, 401, { title: 'Portal token required.' });
+    const authorization = req.headers.authorization ?? '';
+    if (authorization && !/^Bearer dev-user-token-/.test(authorization)) {
+        sendProblem(res, 401, 'The Portal token is invalid or expired.');
         return;
     }
     const instance = req.headers['x-portal-widget-instance'];
     if (!instance) {
-        sendJson(res, 400, { title: 'Header X-Portal-Widget-Instance with the route widget id is required.' });
+        sendProblem(res, 400, 'Header X-Portal-Widget-Instance with the route widget id is required.');
         return;
     }
-    if (connectionId !== MOCK.connectionId || instance !== MOCK.widgetInstanceId) {
-        res.writeHead(404);
-        res.end();
+    const connection = MOCK.connections.find(candidate => candidate.id === connectionId);
+    // One 404 for unknown, unlinked and not-allowed-for-this-caller, so ids cannot be probed.
+    const anonymous = !authorization;
+    if (!connection || instance !== MOCK.widgetInstanceId || (anonymous && !connection.security.allowAnonymous)) {
+        sendProblem(res, 404, 'Not found.');
         return;
+    }
+    if (anonymous) {
+        const retryAfter = anonymousRetryAfter(req.socket.remoteAddress ?? '', connection.id);
+        if (retryAfter > 0) {
+            sendProblem(res, 429, 'Too many requests.', { 'retry-after': String(retryAfter) });
+            return;
+        }
     }
     const decoded = segments.map(segment => decodeURIComponent(segment));
     if (decoded.some(segment => segment === '.' || segment === '..' || segment.includes('\\'))) {
-        sendJson(res, 400, { title: 'Invalid proxy path.' });
+        sendProblem(res, 400, 'Invalid proxy path.');
         return;
     }
 
@@ -251,16 +304,7 @@ function startServer() {
         }
         // What the settings view lists; the Portal masks every header value.
         if (url.pathname === '/mock-api/api/v2/admin/serviceconnections') {
-            sendJson(res, 200, [
-                {
-                    id: MOCK.connectionId,
-                    name: 'weather',
-                    module: 'portal',
-                    url: 'https://api.weather.example/v1',
-                    isDefault: false,
-                    security: { mode: 2, headers: [{ key: 'x-api-key', value: '********' }] }
-                }
-            ]);
+            sendJson(res, 200, MOCK.connections);
             return;
         }
         const proxyPrefix = '/mock-api/api/v1/proxy/';
@@ -278,7 +322,7 @@ function startServer() {
 
     server.listen(port, () => {
         console.log(`\nPortal harness: http://localhost:${port}/`);
-        console.log(`Mock proxy:     http://localhost:${port}${'/mock-api/api/v1/proxy/'}${MOCK.connectionId}/...`);
+        console.log(`Mock proxy:     http://localhost:${port}/mock-api/api/v1/proxy/{connectionId}/...`);
         console.log('The demo API key is held by this Node process only (set DEMO_API_KEY to change it).\n');
     });
 }

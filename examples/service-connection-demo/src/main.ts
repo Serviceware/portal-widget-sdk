@@ -1,8 +1,9 @@
 /**
- * Calls a third-party API through a Portal Service Connection (EXPERIMENTAL, docs/sdk.md section 5a).
+ * Calls a third-party API through a Portal Service Connection (docs/sdk.md section 5a). Needs Portal 3
+ * with the Service Connection proxy.
  *
- * What is saved in `customConfig` is only the connection *name* and a request path: public, safe.
- * The API key lives in the Service Connection on the Portal server. `ctx.service(name)` sends the
+ * What is saved in `customConfig` is only the connection id and a request path: public, safe.
+ * The API key lives in the Service Connection on the Portal server. `ctx.service(id)` sends the
  * request to `{apiUrl}/api/v1/proxy/{connectionId}/{path}` and the Portal adds the key server-side.
  */
 import {
@@ -37,22 +38,41 @@ function el<K extends keyof HTMLElementTagNameMap>(
     return node;
 }
 
-/** Header names and values exactly as the browser received them; a fixed Portal shows `********`. */
+/** What the widget may know about its linked connections: names, mode and flags, never a secret. */
 function describeLinkedConnections(ctx: WidgetContext<DemoSettings>): string {
-    const connections = ctx.inputs.configuration.serviceConnections ?? [];
+    const connections = ctx.serviceConnections();
     if (connections.length === 0) {
         return 'No Service Connection is linked to this widget instance.';
     }
     return connections
-        .map(connection => {
-            const headers = (connection.security?.headers ?? []).map(h => `${h.key}: ${h.value}`).join(', ') || 'none';
-            return `${connection.name} -> headers visible in the browser: ${headers}`;
-        })
+        .map(
+            connection =>
+                `${connection.name}: ${connection.modeName}, credentials ${connection.hasCredentials ? 'held by the Portal' : 'none'}, ` +
+                `anonymous ${connection.allowAnonymous ? 'allowed' : 'not allowed'}, url ${connection.url ?? '(hidden)'}`
+        )
         .join('\n');
+}
+
+/** A neutral message per proxy status; the SDK hands back the Response unchanged and never retries. */
+function describeFailure(response: Response): string {
+    switch (response.status) {
+        case 401:
+            return 'Your session has expired. Sign in again.';
+        case 404:
+            return 'The connection is not available here (not linked, or not allowed on this page).';
+        case 429:
+            return `Too many requests. Try again in ${response.headers.get('Retry-After') ?? 'a few'} seconds.`;
+        case 502:
+        case 504:
+            return 'The external service did not answer. Try again later.';
+        default:
+            return `The external service answered HTTP ${response.status}.`;
+    }
 }
 
 function mountWidget(ctx: WidgetContext<DemoSettings>): void {
     const settings = withDefaults(ctx.inputs.configuration, schema);
+    const chosen = ctx.serviceConnections().find(c => c.id === settings.connection || c.name === settings.connection);
     const output = el('pre', { className: 'output' }, 'Press "Send request".');
     const linked = el('pre', { className: 'linked' }, describeLinkedConnections(ctx));
     const button = el('button', { type: 'button', className: 'primary' }, 'Send request');
@@ -63,11 +83,13 @@ function mountWidget(ctx: WidgetContext<DemoSettings>): void {
             return;
         }
         button.disabled = true;
-        output.textContent = `GET ${settings.path} via "${settings.connection}"...`;
+        output.textContent = `GET ${settings.path} via "${chosen?.name ?? settings.connection}"...`;
         try {
             const response = await ctx.service(settings.connection)(settings.path, { headers: { accept: 'application/json' } });
             const body = await response.text();
-            output.textContent = `HTTP ${response.status}\n${prettyJson(body)}`;
+            output.textContent = response.ok
+                ? `HTTP ${response.status}\n${prettyJson(body)}`
+                : `HTTP ${response.status}: ${describeFailure(response)}`;
         } catch (error) {
             output.textContent =
                 error instanceof ServiceConnectionNotFoundError || error instanceof TypeError
@@ -84,7 +106,12 @@ function mountWidget(ctx: WidgetContext<DemoSettings>): void {
             'div',
             { className: 'card' },
             el('h3', {}, 'Service Connection demo'),
-            el('p', { className: 'muted' }, `Connection: ${settings.connection || '(not set)'} | path: ${settings.path}`),
+            el(
+                'p',
+                { className: 'muted' },
+                `Connection: ${chosen?.name ?? (settings.connection || '(not set)')} | path: ${settings.path} | ` +
+                    (ctx.inputs.authToken ? 'logged in' : 'anonymous')
+            ),
             button,
             output,
             el('h4', {}, 'What this page can see'),
@@ -123,7 +150,7 @@ function mountSettings(ctx: WidgetContext<DemoSettings>): void {
                     el(
                         'option',
                         { value: connection.id, selected: connection.id === settings.connection || connection.name === settings.connection },
-                        `${connection.name} (${connection.module})`
+                        `${connection.name} (${connection.module}${connection.security?.allowAnonymous ? ', anonymous allowed' : ''})`
                     )
                 );
             }

@@ -8,10 +8,10 @@ importers:
 
   .:
     devDependencies:
-      '@serviceware/portal-widget-cli':
+      '@serviceware-oss/portal-widget-cli':
         specifier: link:../../packages/cli
         version: link:../../packages/cli
-      '@serviceware/portal-widget-sdk':
+      '@serviceware-oss/portal-widget-sdk':
         specifier: link:../../packages/sdk
         version: link:../../packages/sdk
       astro:

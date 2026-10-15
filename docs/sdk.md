@@ -5,17 +5,13 @@ minified, < 2.5 kB gzip** for the full entry; every function tree-shakeable.
 
 npm scope: `@serviceware-oss` (confirmed).
 
-> **No secure third-party authentication in v1.** A widget cannot use a private API key or credential
-> safely: everything in the browser is visible to the visitor, and the Portal has no server-side proxy for
-> Service Connections yet (it even exposes stored header values to anonymous visitors,
-> [backend-findings.md](backend-findings.md) sections 1 and 2). The SDK therefore ships no
-> `createServiceClient`. Authenticated calls are limited to the **Portal API as the current user**
-> (`createPortalFetch`, section 5). Private keys must stay in a backend you control. Widget authors are told
-> this in the package README and in [getting-started.md](getting-started.md) section 9; do not add any API
-> that looks like it authenticates against third parties before the proxy exists. The one exception is the
-> **experimental** `createServiceClient` / `ctx.service` (section 5a). It targets the backend POC in
-> [service-connection-proxy.md](service-connection-proxy.md) and must stay marked experimental until that
-> backend change ships.
+> **Third-party credentials only through Service Connections.** A widget must never hold a private API
+> key or credential: everything in the browser is visible to the visitor. The only supported way to call a
+> third-party API with a credential is a Portal Service Connection through `createServiceClient` /
+> `ctx.service` (section 5a), which needs Portal 3 with the Service Connection proxy. Otherwise
+> authenticated calls are limited to the **Portal API as the current user** (`createPortalFetch`, section 5),
+> and private keys stay in a backend you control. Do not add any other API that authenticates against third
+> parties.
 
 ---
 
@@ -113,9 +109,11 @@ export interface WidgetContext<T> {
   readonly root: ShadowRoot | HTMLElement;            // where to render
   readonly inputs: Readonly<PortalWidgetInputs & { configuration: WidgetConfig<T> }>;
   fetch: typeof fetch;                                // portalFetch bound to current apiUrl/authToken
+  service(connectionIdOrName: string): ServiceFetch;  // Service Connection proxy, section 5a
+  serviceConnections(): ServiceConnectionInfo[];      // linked connections, no secret values, section 5a
   toast: typeof toast;
   openSettings(): void;                               // showConfiguration(inputs.configuration)
-  save(customConfig: T): void;                        // clones configuration, sets customConfig, saveConfiguration()
+  save(customConfig: T, options?: { serviceConnectionsId?: string[] }): void; // clones configuration, sets customConfig, saveConfiguration()
   cancel(): void;
   onResize(cb: (size: { width: number; height: number }) => void): () => void;
   loadTranslations(lang?: string): Promise<Record<string, string>>; // GET storage/v1/widgets/{tag}/{version}/translations/{lang}
@@ -149,9 +147,12 @@ URLs are resolved against `apiUrl` first. No option to disable the check.
 
 This is the **only** authentication the SDK offers, and it authenticates the current user against the
 Portal, not the widget against anything else. There is no way to attach a widget-owned or third-party
-credential; see the note at the top of this document.
+credential; use a Service Connection (section 5a).
 
-### 5a. Experimental: `createServiceClient` / `ctx.service` (needs the backend POC)
+### 5a. `createServiceClient` / `ctx.service` / `ctx.serviceConnections` (Service Connection proxy)
+
+Requires Portal 3 with the Service Connection proxy (no version number assigned yet). Wire contract:
+[contract.md](contract.md) §5a; background: [service-connection-proxy.md](service-connection-proxy.md).
 
 ```ts
 export type ServiceFetch = (path: string, init?: RequestInit) => Promise<Response>;
@@ -160,19 +161,36 @@ export function createServiceClient(
     connectionIdOrName: string
 ): ServiceFetch;
 export function resolveServiceConnection(config, connectionIdOrName): { id: string } | undefined;
+export function listServiceConnections(config: WidgetConfig<unknown> | undefined): ServiceConnectionInfo[];
 export class ServiceConnectionNotFoundError extends Error { readonly connection: string }
+
+export interface ServiceConnectionInfo {
+    id: string; name: string; module: string;
+    mode: number; modeName: SecurityModeName | 'Unknown';
+    isDefault: boolean; hasCredentials: boolean; allowAnonymous: boolean;
+    url: string | null;
+}
 // WidgetContext: service(connectionIdOrName: string): ServiceFetch
+//                serviceConnections(): ServiceConnectionInfo[]
 ```
 
-- Targets `{apiUrl}/api/v1/proxy/{connectionId}/{path}` (contract.md §5a) through `createPortalFetch`, so
-  the Portal bearer token is attached by the same origin rule. A caller-supplied `Authorization` header is
-  dropped. `X-Portal-Widget-Instance` is set to `configuration.id`.
+- Targets `{apiUrl}/api/v1/proxy/{connectionId}/{path}` through `createPortalFetch`, so the Portal bearer
+  token is attached by the same origin rule, and not at all when `authToken` is empty (anonymous pages; the
+  Portal allows that only for connections with `allowAnonymous`). A caller-supplied `Authorization` header
+  is dropped. `X-Portal-Widget-Instance` is set to `configuration.id`.
 - `connectionIdOrName` is matched against `serviceConnections[].id`, then `serviceConnectionsId`, then
   `serviceConnections[].name` (case-insensitive). `getSource` is read on every call.
 - Rejects without sending anything: `ServiceConnectionNotFoundError` when nothing matches, `TypeError` for
   absolute or protocol-relative URLs and for `.` / `..` path segments.
-- The Portal injects the connection's credentials server-side. The widget never sees them. Design, backend
-  changes and known gaps: [service-connection-proxy.md](service-connection-proxy.md).
+- Every answer comes back as the `Response`, unchanged; there is no error class per status. The proxy's own
+  statuses are `400`, `401`, `404`, `429` (honour `Retry-After`), `502`, `504` (`SERVICE_PROXY_STATUS`);
+  upstream statuses pass through. The SDK never retries.
+- `listServiceConnections` / `ctx.serviceConnections()` describe the linked connections. They copy no
+  header, query, password or secret value, not even the `********` masks. `hasCredentials` is true for
+  `BearerToken`, `Basic`, `OAuth2ClientCredentials` and `Custom` with at least one header or query
+  parameter. `allowAnonymous` is false when the Portal does not send it. `url` is `null` when the Portal
+  hides it. Connections linked only by id (right after `save`, before the Portal re-sends the objects) are
+  not listed.
 - Linking: `ctx.save(customConfig, { serviceConnectionsId: [connectionId] })` (`SaveOptions`) replaces
   `configuration.serviceConnectionsId`, and the Portal persists it. Store the connection **id** in
   `customConfig`: it resolves immediately through `serviceConnectionsId`, before the Portal re-sends the

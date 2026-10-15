@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "version": "1.0.0",
-  "description": "Example private widget (EXPERIMENTAL): calls a third-party API through a Portal Service Connection, so the API key stays on the server.",
+  "description": "Example private widget: calls a third-party API through a Portal Service Connection, so the API key stays on the server.",
   "license": "MIT",
   "type": "module",
   "scripts": {

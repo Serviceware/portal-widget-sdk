@@ -25,9 +25,10 @@ by `.github/workflows/release.yml`.
 Widgets built with this SDK are uploaded through **Portal Admin → Widgets → Add private widget**, either
 field by field or by importing the zip the CLI produces.
 
-> **Known limitation:** a widget currently has **no secure way to authenticate against a third-party API**
-> with a private key. Only calls to the Portal API as the current user are supported. The Portal-side
-> proxy for Service Connections does not exist yet; see [packages/sdk/README.md](packages/sdk/README.md)
+> **Third-party credentials:** a widget never holds a private API key. On Portal 3 with the Service
+> Connection proxy, the admin stores the credential in a Service Connection and the widget calls
+> `ctx.service(name)(path)`; the Portal adds the credential server-side. Without the proxy, only calls to the
+> Portal API as the current user are supported. See [docs/service-connection-proxy.md](docs/service-connection-proxy.md)
 > and [docs/security.md](docs/security.md).
 
 ## Agent skill

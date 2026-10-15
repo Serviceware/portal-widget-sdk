@@ -15,7 +15,7 @@ is about making it hard for an honest developer to leak something by accident.
 | Uploaded translation files | Every visitor. | Public. |
 | `authToken` (element property) | The current user only. It is **their** Portal token. | A widget that sends it to a third party leaks the user's session. |
 | `configuration.userProfile` | The current user only. | Personal data; never persist or forward. |
-| `configuration.serviceConnections[].security.headers` | **Every visitor of the page today** (verified: anonymous config endpoints return the values, see backend-findings.md §2). | Raw keys exposed. Backend fix required; do not link keyed connections to widgets on public pages until then. |
+| `configuration.serviceConnections[]` | Every visitor of the page. | With the Service Connection proxy: names, mode and header/query **keys** only; every value is `********`, and `url` is `null` for anonymous visitors when the connection has credentials. Without the proxy the values are sent in clear (backend-findings.md §2): do not link keyed connections to widgets on public pages there. |
 | Portal CSP | `connect-src *`, `script-src` allows `'unsafe-inline'`/`'unsafe-eval'`. | Widgets can call any origin. No network-level protection to rely on. |
 
 ---
@@ -24,41 +24,30 @@ is about making it hard for an honest developer to leak something by accident.
 
 ### Tier 1 — Server-held secrets via Service Connections (recommended)
 
-The Portal already models third-party credentials server-side:
+Requires Portal 3 with the Service Connection proxy ([service-connection-proxy.md](service-connection-proxy.md),
+[contract.md](contract.md) §5a). Secrets go into a **Service Connection**, never into `customConfig` and never
+into a `secret: true` field: everything a widget saves ends up in the browser of every visitor.
 
-```ts
-type ServiceConnection = {
-  id: string; name: string; module: string; url: string; isDefault: boolean;
-  security?: { mode: 0 /*None*/ | 1 /*BearerToken*/ | 2 /*Custom*/; headers?: { key: string; value: string }[] };
-};
-```
+- The **admin** creates the connection in the Portal (base URL + mode + credential) and links it to the widget
+  instance in the widget settings. The Portal encrypts the credential at rest and returns it only as
+  `"********"`, to admins too.
+- The **widget** stores only the connection id or name in `customConfig` and calls
+  `ctx.service(idOrName)(path)`. The request goes to the Portal, which checks the link and the caller, drops
+  the caller's `Authorization` and cookies, adds the credential and forwards to the connection URL.
+- Modes, from the widget author's view: `Custom` (API key as header or query parameter), `BearerToken`
+  (fixed bearer token), `Basic` (username + password), `OAuth2ClientCredentials` (client id + secret; the
+  Portal fetches the access token), `ForwardUserToken` (the logged-in user's Portal token, for a backend that
+  trusts the Portal's identity provider), `None`.
+- **Anonymous pages** work only for connections the admin marked `allowAnonymous` (never
+  `ForwardUserToken`); the Portal rate limits them per client IP. For anonymous callers the Portal also
+  returns `url: null` for connections with credentials.
+- `ctx.serviceConnections()` tells the widget which connections are linked (id, name, mode, flags) without
+  any secret or masked value. Do not read `configuration.serviceConnections[].security` values yourself:
+  Portals without the proxy still send them in clear.
 
-The admin configures the connection (URL + headers such as `x-api-key`) in the Portal. The widget only
-references the connection by id/name. The secret never reaches the browser **provided the Portal backend
-proxies the call and injects the headers**.
-
-**Backend status (verified, see [backend-findings.md](backend-findings.md)):**
-
-1. **No usable proxy exists.** The gateway's `ServiceConnectionsApiHandler` only rewrites the host for the
-   hard-coded `knowledge`/`messaging` modules and never applies `Security.Headers`. Tier 1 requires the new
-   proxy described in backend-findings.md §4.
-2. **Header values currently leak to anonymous visitors.** `RouteWidgetHelper` attaches full
-   `ServiceConnections` (with plain-JSON `Security`, values included) to every route widget, and the
-   unauthenticated `api/v1/config/routes/{path}` / `api/v1/config/routewidgets/{id}` endpoints return them.
-   Fix proposed in backend-findings.md §2. Until fixed, admins must not store real keys in service
-   connections that are linked to widgets on public pages.
-
-Consequence for the SDK today: **there is no secure way for a browser widget to use a private API key**.
-The SDK documentation says so plainly (package README, first section; `docs/sdk.md`, top note;
-`docs/getting-started.md` section 9), and `createServiceClient` ships only once the proxy exists. Widget
-authors who need a private key must put it in a backend they control that validates the forwarded Portal
-token.
-
-**Proof of concept (experimental):** the backend branch `poc/widget-connection-proxy` implements the
-proxy, encrypts header values at rest and masks them in every read model. The SDK exposes it as
-`ctx.service(nameOrId)` / `createServiceClient`. See [service-connection-proxy.md](service-connection-proxy.md),
-including the gaps (page authorisation, SSRF, key management) that block production use. Until that
-backend change ships, the statement above holds for every released Portal.
+On a Portal without the proxy there is **no secure way for a browser widget to use a private API key**. Use
+tier 2 for keys that are public by design, or a backend you control that holds the key and validates the
+forwarded Portal token.
 
 ### Tier 2 — Browser-safe public keys in `customConfig`
 
@@ -79,6 +68,8 @@ SDK v1. Document as "bring your own".
 |---|---|
 | `portalFetch(url, init)` | Adds `Authorization: Bearer <authToken>` **only** when `url` starts with `apiUrl`. Mirrors the Portal's own interceptor. No option to attach the token elsewhere. |
 | Config schema with `secret: true` | `defineConfigSchema({ apiKey: { type: 'string', secret: true } })`. `saveConfiguration()` throws if any `secret` field is non-empty. Prevents persisting a secret into `customConfig` even by mistake. |
+| `ctx.service()` / `createServiceClient` | Only paths relative to the connection URL (no scheme, no `//`, no `.`/`..` segments). A caller-set `Authorization` is dropped; the Portal token goes only to `apiUrl`, and none is sent for anonymous users. |
+| `ctx.serviceConnections()` / `listServiceConnections` | Copy id, name, module, mode and flags only; never header, query, password or secret values, not even the masks. |
 | No logging of sensitive values | The SDK never logs `configuration` or `authToken`. `debugConfig(config)` returns a redacted copy (`authToken`, `userProfile`, `serviceConnections[].security`, `secret` fields → `"[redacted]"`). |
 | Token not stored | The SDK keeps `authToken` in closure scope only; never in `localStorage`, `sessionStorage`, cookies or globals. |
 | No `eval`, no dynamic script injection | Keeps the SDK compatible with a future tighter CSP. |
@@ -100,10 +91,10 @@ SDK v1. Document as "bring your own".
 
 ## 5. Items that need a Portal-side change (answers in [backend-findings.md](backend-findings.md))
 
-1. **Service connection proxy endpoint** — does not exist. Request it (backend-findings.md §4). Blocks
-   Tier 1.
-2. **`security.headers` values leak** through anonymous config endpoints — confirmed. Redact
-   (backend-findings.md §2). High priority, independent of the SDK.
+1. **Service connection proxy endpoint** — provided by Portal 3 with the Service Connection proxy
+   (contract.md §5a). Enables Tier 1.
+2. **`security.headers` values leak** through anonymous config endpoints — fixed by the same change (values
+   masked on every read, `url` hidden from anonymous callers). Portals without it still leak.
 3. **Admin upload of arbitrary JS** is by design (private widgets). Document for admins: only install
    bundles from sources you trust; a widget has full access to the page.
 4. Consider a Portal-side, optional **allowlist of outbound origins per private widget** in the future.

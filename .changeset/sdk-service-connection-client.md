@@ -2,12 +2,20 @@
 "@serviceware-oss/portal-widget-sdk": minor
 ---
 
-Add the experimental `createServiceClient` and `ctx.service(nameOrId)`. They send widget requests to
-`{apiUrl}/api/v1/proxy/{connectionId}/{path}` with the Portal token and `X-Portal-Widget-Instance`, so the
-Portal injects the Service Connection's credentials server-side. This needs the Portal backend proof of
-concept (docs/service-connection-proxy.md) and does not work on any released Portal yet. Also adds the
-contract constants `SERVICE_PROXY_PATH`, `WIDGET_INSTANCE_HEADER` and `serviceProxyPath()`, plus
-`resolveServiceConnection` and `ServiceConnectionNotFoundError`.
+Add Service Connection support for Portal 3 with the Service Connection proxy. A widget calls a
+third-party API through the Portal, which adds the connection's credential server-side, so no secret
+reaches the browser.
 
-`ctx.save(customConfig, { serviceConnectionsId })` (new `SaveOptions`) lets a widget's settings view link
-Service Connections to its instance.
+- `ctx.service(idOrName)` / `createServiceClient(getSource, idOrName)` send requests to
+  `{apiUrl}/api/v1/proxy/{connectionId}/{path}` with `X-Portal-Widget-Instance`, and with the Portal token
+  only when the user is logged in (anonymous pages work for connections the admin allowed for anonymous use).
+  The `Response` is returned unchanged; nothing is retried. `ServiceConnectionNotFoundError` when the
+  connection is not linked to the instance.
+- `ctx.serviceConnections()` / `listServiceConnections(configuration)` return
+  `{ id, name, module, mode, modeName, isDefault, hasCredentials, allowAnonymous, url }` for the linked
+  connections, never any header, query, password or secret value.
+- `ctx.save(customConfig, { serviceConnectionsId })` (new `SaveOptions`) links connections to the instance.
+- `SecurityModes` gains `Basic`, `OAuth2ClientCredentials` and `ForwardUserToken`; `ServiceConnectionSecurity`
+  gains `queryParameters`, `basic`, `oAuth2` and `allowAnonymous`; `ServiceConnection.url` may be `null`.
+- Contract constants `SERVICE_PROXY_PATH`, `WIDGET_INSTANCE_HEADER`, `serviceProxyPath()`,
+  `SERVICE_PROXY_STATUS`, `SERVICE_PROXY_LIMITS`, `MASKED_SECRET_VALUE`, plus `resolveServiceConnection`.
