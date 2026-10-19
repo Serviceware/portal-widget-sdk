@@ -22,8 +22,8 @@ Read this before touching `libs/create-widget/` or `widgets/embed-widget/`.
 ## The problem it solves
 
 The Portal has always accepted private widget uploads at
-**Administration → Configuration → Widgets management**, behind the `private-widgets`
-feature flag. The upload worked. The gap was that **nobody outside the frontend team could
+**Administration → Configuration → Widgets management**, at the time behind the `private-widgets`
+feature flag (Portal 3 has since enabled private widgets for every tenant). The upload worked. The gap was that **nobody outside the frontend team could
 produce something to upload** — no documentation existed and the ZIP format was undocumented.
 
 A trap that caused real confusion: **two unrelated files are both called
@@ -205,7 +205,7 @@ admin saves settings. `ngOnInit` reads config once and the view goes stale.
 | Symptom | Cause |
 |---|---|
 | Configuration page "will not open" | Expired session. Redirects to Keycloak silently. Log in again. |
-| No "Add private widget" button | You deep-linked. `FeatureFlagsService` guards with `if (!this._featureFlags)` and `[]` is truthy, so an empty array caches for the page load. Go Home first, then Configure. |
+| No "Add private widget" button | Only where the `private-widgets` feature flag still gates the button (Portal 2, early 3.x). You deep-linked. `FeatureFlagsService` guards with `if (!this._featureFlags)` and `[]` is truthy, so an empty array caches for the page load. Go Home first, then Configure. |
 | Import menu entry is a code word | `widgets_management_import_private_widget` has no translation. Harmless. |
 | Upload greyed out, no reason | A language file over **1 MB** (picker advertises 5 MB; `PortalValidators.validateJSONFile` enforces 1) or a duplicate `tagName`. |
 | Cannot re-import an existing widget | By design — Import creates a **new** widget and tags must be unique. Use **Edit**, or delete first. |
@@ -239,9 +239,9 @@ Not caused by this work. Each deserves its own ticket.
    `pnpm install` (needs internal Azure feed credentials), `pnpm run build`. Expect both
    bundles, the `CSS isolation skipped for CB3 preset widget` line, and **no**
    widget-name-inference warning.
-4. `ssp-widget pack`, then import through the Portal's real Import button. The feature flag
-   must be enabled or the button does not render:
-   `INSERT INTO labs_selfserviceportal.featureflags (id, website, name) VALUES ('<uuid>', 1, 'private-widgets')`
+4. `ssp-widget pack`, then import through the Portal's real Import button. On a Portal that still
+   gates private widgets (Portal 2, early 3.x), the `private-widgets` feature flag must be enabled or the
+   button does not render.
 5. Place it, open its gear in the page-config panel, change a setting, confirm other
    placements are unaffected.
 

@@ -1,6 +1,6 @@
 ---
 name: portal-private-widget
-description: Build, test and package a private widget for Serviceware Portal 3.x with @serviceware-oss/portal-widget-sdk and @serviceware-oss/portal-widget-cli. Use when asked to create, scaffold, port, fix, build, pack or import a Portal widget, custom element or "private widget", produce the Portal import ZIP, or embed a URL as a Portal widget tile. Covers vanilla TS, React, Vue, Lit, Svelte and pre-rendered (Astro) widgets.
+description: Build, test and package a private widget for Serviceware Portal 3.x or Portal 2.x with @serviceware-oss/portal-widget-sdk and @serviceware-oss/portal-widget-cli. Use when asked to create, scaffold, port, fix, build, pack or import a Portal widget, custom element or "private widget", produce the Portal import ZIP, or embed a URL as a Portal widget tile. Covers vanilla TS, React, Vue, Lit, Svelte and pre-rendered (Astro) widgets.
 ---
 
 # Serviceware Portal private widget
@@ -13,12 +13,28 @@ bundle files into the ZIP an administrator imports. If anything here disagrees w
 [`docs/contract.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/contract.md), the
 contract wins.
 
-## 1. Choose the path
+## 1. Choose the path and the Portal version
 
 - **Embed** (no code): a named tile that shows an existing web page in an iframe. Go to section 9.
 - **Custom**: anything with its own UI, settings or Portal API calls. Sections 2-8.
 
 Ask only if it is genuinely unclear. Default to custom with vanilla TypeScript, or the framework the user named.
+
+**Target Portal.** If the user didn't say, ask: "Portal 3, Portal 2, or both?" (default Portal 3). The
+upload, the ZIP, the element properties and the events are the same in both; the CSS mode and a few admin
+steps differ:
+
+| | Portal 3 | Portal 2 | Both |
+|---|---|---|---|
+| CSS mode (section 5) | light: `node build.mjs` | **shadow: `node build.mjs --shadow`** | shadow |
+| `dependencies` in `portal-widget.json` | `>=3.0.0` | `>=2.0.0` | `>=2.0.0` |
+| Import (section 8) | no feature flag | `private-widgets` feature flag | both |
+| Settings entry point for admins | page configuration panel | the tile's ⋮ menu → widget settings | both |
+
+Why shadow on Portal 2: Portal 2 doesn't stamp the `[<tag>]` attribute on its widget wrapper, so light-mode
+CSS (scoped to `[<tag>]`) matches nothing there and the tile renders unstyled. Portal 2 also has no compliance
+probe, so shadow mode logs no warning there. On Portal 3, shadow mode works but logs a `[Widget Compliance]`
+warning; that is the expected trade-off for a widget that must run on both.
 
 ## 2. Get the packages
 
@@ -101,6 +117,9 @@ Rules. The first four are **not** caught by `validate`, but break the widget in 
 - `name`, `description`, `changes` need an `en` entry; name ≤ 100 chars, the others ≤ 4000 (HTML allowed).
 - `tags` ≤ 10, each `^[a-zA-Z0-9-]+$`; `dependencies` ≤ 10; `defaultSize` integers 1-12.
 - `authenticated: true` hides the widget from anonymous visitors.
+- `dependencies` is shown to admins but not enforced. Use the value for the target Portal from section 1.
+- There is no `portalVersion` field: the backend stores private widgets without one, so every private
+  widget is offered on Portal 2 and Portal 3 tenants alike. Only the CSS mode decides where it renders well.
 - Optional `"languageFiles": ["translations/en.json"]`: culture-named files (`en`, `de-DE`), valid non-empty
   JSON, ≤ 1 MB each. Optional `"logo": "logo.png"`, PNG ≤ 2 MB.
 
@@ -292,8 +311,12 @@ compliance probe requires.
 - Keep `styles.css` flat (no at-rules). Instead of `@media`, use classes toggled from `portalScreenLayout`.
 - Style only classes you own, never `html`/`body`/`:root`. No runtime CSS-in-JS. Don't append elements to
   `document.body`.
-- Shadow mode (`node build.mjs --shadow`) isolates fully, but the probe logs a warning today. Only use it
-  if the user asks.
+- Shadow mode (`node build.mjs --shadow`) isolates fully, but on Portal 3 the probe logs a warning today.
+  Use it for Portal 2 or "both" (section 1), or if the user asks.
+- For shadow mode, change the `build` script to `tsc --noEmit && node build.mjs --shadow`. `styles.css` then
+  stays unscoped inside the shadow root, `:host` styles the element, and at-rules such as `@media` are allowed.
+- Portal 2 has unlayered global styles: in light mode they would win over `@layer widgets`. Another reason
+  to use shadow mode there.
 
 ## 6. Secrets and data (hard rules)
 
@@ -319,7 +342,8 @@ npx portal-widget validate <tag>.zip       # a "preludeMissing" warning is expec
 ```
 
 Fix every **error** and rerun. Before you report done, check: tag rules, `version` 1.0.0, `angularVersion` 0,
-no secrets, flat scoped CSS, settings UI only under `settingsMode`.
+no secrets, the CSS mode for the target Portal (light and flat scoped CSS for Portal 3, shadow for Portal 2
+or both), settings UI only under `settingsMode`.
 
 To try the widget in a local Portal mock (inputs, toasts, settings dialog, layout switch, compliance probe),
 get these files from the SDK repository:
@@ -332,12 +356,15 @@ the tile, open the settings, save, confirm the tile updates, and switch the layo
 
 ## 8. Import (tell the user; it needs a Portal admin)
 
-1. Requires the `private-widgets` feature flag. Open Portal **Home** first, then **Administration →
-   Configuration → Widgets** (`admin/configuration?tab=4`). Deep-linking there directly can hide the button.
+1. Open Portal **Home** first, then the widget management in the administration. Portal 3:
+   **Administration → Configuration → Widgets** (`admin/configuration?tab=4`). Portal 2:
+   `admin/widgets-management`, and the tenant needs the `private-widgets` feature flag (early Portal 3.x
+   releases needed it too). Deep-linking there directly can hide the button.
 2. Click the **small arrow** next to **Add private widget** → Import → pick `<tag>.zip` → Upload.
-3. Place it on a page. Its settings are the gear in the **page configuration panel's** widget list, not on
-   the tile.
-4. The console must show no `[Widget Compliance]` warning.
+3. Place it on a page. Portal 3: its settings are the gear in the **page configuration panel's** widget
+   list, not on the tile. Portal 2: the ⋮ menu beside the tile in administration mode → widget settings.
+4. Portal 3: the console must show no `[Widget Compliance]` warning (a shadow-mode widget logs one, see
+   section 1). Portal 2 has no such check: confirm the tile is styled.
 5. Updating: Import refuses an existing tag. Use **Edit** on the widget, or delete and re-import. For quick
    iteration, override `…/storage/v1/widgets/<tag>-1.0.0-full.js` in Chrome DevTools → Sources → Overrides.
 
@@ -350,6 +377,9 @@ printf 'embed\nIT Status\nhttps://status.example.com\n' | npx portal-widget
 Writes `portal-widget.json` and `ssp-it-status.zip`. If the derived tag has digits or `light`/`full`, edit
 `tagName` and run `npx portal-widget pack`. Import as in section 8. The target site must allow framing.
 
+The embed bundle is a prebuilt Portal 3 widget and is **not verified on Portal 2**. For Portal 2, build a
+small custom widget instead (shadow mode) that renders the `<iframe>`.
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -358,8 +388,9 @@ Writes `portal-widget.json` and `ssp-it-status.zip`. If the derived tag has digi
 | Blank tile, `.js` 404 | `version` isn't 1.0.0, or the tag has digits / `light` / `full` |
 | Tile doesn't update after the admin saves | Re-render on `changed.configuration` in `onInputsChange` |
 | Save does nothing | Only call `ctx.save` in settings mode; a non-empty `secret` field makes it throw |
-| `[Widget Compliance]` warning, Portal styles changed | Unscoped or unlayered CSS: use light mode and a flat `styles.css`, and don't add your own `<style>` tags (the SDK's `<style data-portal-widget>` is expected) |
-| No "Add private widget" button | Feature flag off, or you deep-linked: go Home first |
+| `[Widget Compliance]` warning, Portal styles changed | A shadow-mode widget logs the warning without changing Portal styles; that is expected on Portal 3. Otherwise unscoped or unlayered CSS: use light mode and a flat `styles.css`, and don't add your own `<style>` tags (the SDK's `<style data-portal-widget>` is expected) |
+| No "Add private widget" button | You deep-linked: go Home first. Portal 2 (and early Portal 3.x): the `private-widgets` feature flag is off |
+| Portal 2: tile unstyled, layout collapsed | Built in light mode: rebuild with `node build.mjs --shadow`, re-pack, Edit the widget |
 | Upload greyed out | A language file > 1 MB, or the tag already exists (use Edit) |
 | Import menu entry shows `widgets_management_import_private_widget` | Missing Portal translation, harmless |
 | `pack`: tag not found in bundle | The tag must appear as a string literal: use the build define |
