@@ -53,6 +53,10 @@ npx skills add Serviceware/portal-widget-sdk --skill portal-private-widget
 Or copy `skills/portal-private-widget/` into your agent's skills directory by hand. The GitHub-based
 routes need this repository to be public.
 
+Opened this repository itself in Claude Code? [`CLAUDE.md`](CLAUDE.md) sends widget requests to the skill
+(ask for a widget in plain language, for Portal 3 or Portal 2), and `/plugin marketplace add ./` makes it a
+slash command without copying it.
+
 ## Why a separate public repo
 
 - The Portal monorepo's widget tooling (`@ssp/utils`, `@ssp/core`, `@codeblue/*`) lives on private Azure

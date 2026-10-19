@@ -2,6 +2,7 @@
 
 Everything a private widget needs to know to run inside Serviceware Portal 3.x. Verified against
 `SSP_Portal` branch `portal30` at commit `5db6e508` (see [reference-sources.md](reference-sources.md)).
+Portal 2.x implements the same contract with the differences listed in [section 11](#11-portal-2x).
 
 Both packages in this repo implement this document. When the Portal changes, update this file first.
 
@@ -305,3 +306,40 @@ optional), `fileFull` (file), `fileLight` (file), `fileLanguages` (file, repeata
 - **Deployed Portal**: Chrome DevTools → Sources → Overrides, override the
   `{apiURL}/storage/v1/widgets/<file>.js` response with your build.
 - Either way: open the console and confirm there is **no `[Widget Compliance]` warning**.
+
+---
+
+## 11. Portal 2.x
+
+Portal 2 is the same frontend repository on branch `main` (Angular 21); both Portal versions share one
+backend. Compared on `main` at `ba69dab8` and `portal30` at `c3c96c64` (Portal frontend) and the backend at
+`070d7a40`; see [reference-sources.md](reference-sources.md#portal-2x).
+
+**Identical in Portal 2:** bundle URL and classic-script loading (§1), every element property and both
+element events (§2, §3, same template bindings), the window event names, suffix and payloads (§4, same
+`events.enum.ts` and event classes), bearer-token scoping to `apiUrl` and the translations endpoint (§5),
+the light/full pick rule (§6, against Portal 2's Angular major **21**), the import zip, the upload dialog
+and the backend endpoint (§9).
+
+**Different in Portal 2:**
+
+| Topic | Portal 3 | Portal 2 |
+|---|---|---|
+| Host attribute | The wrapper `<ssp-portal-widget>` gets an attribute named after the tag (§1 step 3). | **Not stamped.** Light-mode CSS scoped to `[<tag>]` matches nothing, so the widget renders unstyled. |
+| Compliance probe | Runs ~1.5 s after mount (§7). | Does not exist. |
+| Cascade layers | Full layer order (§7). | Only `@layer codeblue`; the rest of the Portal CSS is unlayered and beats any `@layer widgets` rule. |
+| CSS mode for SDK widgets | `light` (default of the skill). | **`shadow`**: the only mode that styles the widget and keeps it isolated. |
+| `hidden` on the element | Set while a skeleton shows, or off the dashboard outside the settings dialog. | Set while a skeleton shows, or off the dashboard, also inside the settings dialog. |
+| Admin settings entry | Page configuration panel. | The Portal's own ⋮ menu beside the tile ("widget settings", copy, details). |
+| Private widget admin UI | No feature flag (removed; early 3.x releases required `private-widgets`). | Behind the `private-widgets` feature flag, route `admin/widgets-management`. |
+| Local dev override | `dev-widgets.json` (§10). | Not available; use DevTools overrides. |
+
+**Portal version of a private widget.** The upload carries no `portalVersion`. The backend stores private
+widget versions with an empty Portal version on purpose, and an empty value is compatible with every
+tenant Portal version, so a private widget is offered to Portal 2 and Portal 3 tenants alike.
+`dependencies` (e.g. `Portal >=2.0.0`) is stored and shown, not enforced. The `portalVersion` field of the
+repo metadata (§8) only matters for widgets published through the widget registry, which private widgets
+are not.
+
+**Not verified on Portal 2:** a live import and render (the differences above come from source only), and
+the CLI's prebuilt embed bundle (built against Angular 22 with `[<tag>]`-scoped CSS).
