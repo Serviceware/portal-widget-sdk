@@ -212,10 +212,13 @@ X-Portal-Widget-Instance: <configuration.id>  required; the connection must be l
 | 4 | `OAuth2ClientCredentials` | `Authorization: Bearer <token>` fetched with the client credentials grant and cached until shortly before expiry |
 | 5 | `ForwardUserToken` | the caller's Portal access token (logged-in callers only) |
 
-Every secret value is returned as `"********"` (`MASKED_SECRET_VALUE`) on every read, admin included. Portals
-without the proxy send `security` as a JSON string with real values; widgets must not read or show any
-value. `listServiceConnections()` / `ctx.serviceConnections()` return only id, name, module, mode, flags and
-url.
+In a widget's configuration `security` is the stored JSON string, as before the proxy (property names as
+stored, often PascalCase: `Mode`, `Headers`, …). Secret values are `"********"` (`MASKED_SECRET_VALUE`)
+unless the admin keeps **Give credentials to widgets** on (`exposeCredentials: true`): then they hold the
+real values so widgets built before the proxy keep working. Every connection that existed before the proxy
+starts with it on; new connections start with it off. Admin reads are always masked. Widgets must not read
+or show any value. `listServiceConnections()` / `ctx.serviceConnections()` return only id, name, module,
+mode, flags and url.
 
 **Linking a connection to an instance.** The admin links connections in the widget settings. The widget's
 settings view sets `serviceConnectionsId` on the configuration it emits with `configurationSaved`

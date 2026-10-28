@@ -168,6 +168,7 @@ describe('listServiceConnections', () => {
             connection('oauth', { mode: 4, oAuth2: { tokenUrl: 'https://idp.example/token', clientId: 'portal', clientSecret: 'client-secret' } }),
             connection('forward', { mode: 5 }),
             connection('legacy', '{"mode":2,"headers":[{"key":"x-api-key","value":"real-key"}]}'),
+            connection('stored', '{"Mode":1,"Headers":[{"Key":"Authorization","Value":"Bearer real-key"}],"AllowAnonymous":true}'),
             connection('broken', 'not json'),
             connection('future', { mode: 9 })
         ]
@@ -183,6 +184,7 @@ describe('listServiceConnections', () => {
             ['oauth', 4, 'OAuth2ClientCredentials', true, false],
             ['forward', 5, 'ForwardUserToken', false, false],
             ['legacy', 2, 'Custom', true, false],
+            ['stored', 1, 'BearerToken', true, true],
             ['broken', 0, 'None', false, false],
             ['future', 9, 'Unknown', false, false]
         ]);

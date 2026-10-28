@@ -16,6 +16,9 @@ reaches the browser.
   connections, never any header, query, password or secret value.
 - `ctx.save(customConfig, { serviceConnectionsId })` (new `SaveOptions`) links connections to the instance.
 - `SecurityModes` gains `Basic`, `OAuth2ClientCredentials` and `ForwardUserToken`; `ServiceConnectionSecurity`
-  gains `queryParameters`, `basic`, `oAuth2` and `allowAnonymous`; `ServiceConnection.url` may be `null`.
+  gains `queryParameters`, `basic`, `oAuth2` and `allowAnonymous`; `ServiceConnection.url` may be `null`;
+  `ServiceConnection.exposeCredentials` is new.
+- `listServiceConnections()` reads `security` as object or as the stored JSON string, whatever the casing
+  of its property names.
 - Contract constants `SERVICE_PROXY_PATH`, `WIDGET_INSTANCE_HEADER`, `serviceProxyPath()`,
   `SERVICE_PROXY_STATUS`, `SERVICE_PROXY_LIMITS`, `MASKED_SECRET_VALUE`, plus `resolveServiceConnection`.

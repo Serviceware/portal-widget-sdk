@@ -123,8 +123,14 @@ export interface ServiceConnection {
     module: string;
     /** Base URL of the third-party API. `null` for anonymous callers when the connection carries credentials. */
     url: string | null;
+    /**
+     * In a widget's configuration this is the stored JSON string (see docs/contract.md); read it through
+     * `listServiceConnections()`, never directly.
+     */
     security?: ServiceConnectionSecurity;
     isDefault: boolean;
+    /** Pre-proxy behaviour: the configuration carries the real credentials. Turned off by the admin per connection. */
+    exposeCredentials?: boolean;
     websiteId?: number | string;
 }
 

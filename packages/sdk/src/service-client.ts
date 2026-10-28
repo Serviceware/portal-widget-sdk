@@ -61,7 +61,7 @@ export function resolveServiceConnection(
 }
 
 function readSecurity(security: unknown): Record<string, unknown> {
-    // Portals before the proxy send `security` as a JSON string.
+    // Widget configurations send `security` as the stored JSON string, as before the proxy.
     if (typeof security === 'string') {
         try {
             security = JSON.parse(security);
@@ -69,7 +69,20 @@ function readSecurity(security: unknown): Record<string, unknown> {
             return {};
         }
     }
-    return security && typeof security === 'object' ? (security as Record<string, unknown>) : {};
+    return security && typeof security === 'object' ? (camelKeys(security) as Record<string, unknown>) : {};
+}
+
+/** The string form keeps the stored property names (`Mode`, `Headers`, …); read them like the camelCase object. */
+function camelKeys(value: unknown): unknown {
+    if (Array.isArray(value)) {
+        return value.map(camelKeys);
+    }
+    if (value && typeof value === 'object') {
+        return Object.fromEntries(
+            Object.entries(value).map(([key, item]) => [key.charAt(0).toLowerCase() + key.slice(1), camelKeys(item)])
+        );
+    }
+    return value;
 }
 
 const hasEntries = (value: unknown): boolean => Array.isArray(value) && value.length > 0;
