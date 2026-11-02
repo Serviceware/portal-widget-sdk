@@ -216,7 +216,8 @@ In a widget's configuration `security` is the stored JSON string, as before the 
 stored, often PascalCase: `Mode`, `Headers`, …). Secret values are `"********"` (`MASKED_SECRET_VALUE`)
 unless the admin keeps **Give credentials to widgets** on (`exposeCredentials: true`): then they hold the
 real values so widgets built before the proxy keep working. Every connection that existed before the proxy
-starts with it on; new connections start with it off. Admin reads are always masked. Widgets must not read
+starts with it on, and so does a new connection saved by an admin UI that does not know the switch; with the
+switch the admin decides (off by default). Admin reads are always masked. Widgets must not read
 or show any value. `listServiceConnections()` / `ctx.serviceConnections()` return only id, name, module,
 mode, flags and url.
 
