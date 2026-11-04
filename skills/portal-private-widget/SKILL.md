@@ -294,7 +294,9 @@ compliance probe requires.
 - Style only classes you own, never `html`/`body`/`:root`. No runtime CSS-in-JS. Don't append elements to
   `document.body`.
 - Shadow mode (`node build.mjs --shadow`) isolates fully, but the probe logs a warning today. Only use it
-  if the user asks.
+  if the user asks — or when the widget must run on an **on-premise Portal 2.3**: that Portal neither marks the
+  widget host with `[<tag>]` nor has the `widgets` layer, so light-mode styles do not apply there. Ask which
+  Portal the widget targets; versions per feature: [`docs/compatibility.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/compatibility.md).
 
 ## 6. Secrets and data (hard rules)
 
@@ -304,8 +306,9 @@ compliance probe requires.
 - `authToken` is the user's Portal session. Only send it to `apiUrl` (via `ctx.fetch`); never forward or
   store it.
 - **Private keys go into a Portal Service Connection, never into the widget** — not into `customConfig`, not
-  into a `secret: true` field, not into the bundle. Needs Portal 3 with the Service Connection proxy; ask the
-  user whether their Portal has it. If yes:
+  into a `secret: true` field, not into the bundle. Needs Portal 3 with the Service Connection proxy: today the
+  Portal in the cloud has it, on-premise 3.0 and 2.3 do not ([`docs/compatibility.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/compatibility.md)); ask the user which Portal
+  the widget targets. If it has the proxy:
   - The admin creates the connection (base URL + mode: `Custom` = API key header or query parameter,
     `BearerToken`, `Basic`, `OAuth2ClientCredentials`, `ForwardUserToken` = the user's Portal token) and
     links it to the widget instance in the widget settings.
@@ -318,7 +321,8 @@ compliance probe requires.
     nothing is linked yet: tell the admin to link it in the settings.
   - `ctx.serviceConnections()` gives `{ id, name, module, mode, modeName, isDefault, hasCredentials,
     allowAnonymous, url }` without any secret. Never read or display `configuration.serviceConnections[].security`
-    values.
+    values: it is the stored JSON string, and while the admin keeps *Give credentials to widgets* on
+    (`exposeCredentials`, the default for connections from before the proxy) it holds the real credentials.
   - On anonymous pages it works only for connections the admin marked *allow anonymous*.
   Without the proxy, tell the user plainly there is no secure browser-side option: use a key that is public by
   design and referrer-restricted (can go in `customConfig`, documented as public), or their own backend that

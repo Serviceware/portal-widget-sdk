@@ -19,6 +19,16 @@ React, Vue, Lit, Svelte or Angular.
 > Working example:
 > [`examples/serviceware-logo-three`](https://github.com/Serviceware/portal-widget-sdk/tree/main/examples/serviceware-logo-three).
 
+## Compatibility
+
+| SDK | Portal 2.3 (on-premise) | Portal 3.0 (on-premise) | Portal 3 in the cloud |
+|---|---|---|---|
+| 0.2.0 | ✅ with `cssMode: 'shadow'`, no `ctx.service()` | ✅, no `ctx.service()` | ✅ |
+| 0.1.x | ✅ with `cssMode: 'shadow'` | ✅ | ✅ |
+
+The latest SDK is always compatible with the latest Portal in the cloud. Per feature:
+[`docs/compatibility.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/compatibility.md).
+
 ## Usage
 
 ```ts

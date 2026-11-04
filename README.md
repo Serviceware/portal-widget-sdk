@@ -66,6 +66,8 @@ routes need this repository to be public.
 
 0. [docs/getting-started.md](docs/getting-started.md) – build, test, pack and import your first widget, with
    any framework. Start here if you want to write a widget rather than work on the SDK.
+   [docs/compatibility.md](docs/compatibility.md) – which SDK version runs on which Portal version (on-premise
+   2.3 and 3.0, cloud).
 1. [docs/contract.md](docs/contract.md) – the exact Portal ↔ widget contract (events, element I/O, bundle
    loading, light vs full, zip format). **Single source of truth for both packages.**
 2. [docs/security.md](docs/security.md) – threat model, where secrets may and may not live, guardrails.
