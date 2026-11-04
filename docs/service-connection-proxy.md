@@ -89,6 +89,10 @@ Against a Portal with the proxy: create a connection, import the demo zip
 press **Send request**. The browser's network tab shows the Portal token and `X-Portal-Widget-Instance`,
 never the key; the anonymous config endpoints show `********`.
 
+Every security mode: `examples/service-connection-auth-modes` has one test widget per mode, a local test API
+that accepts each mode only with the right credential, and `pnpm e2e`, which checks all six modes through a real
+Portal proxy plus masking and refusals, without the UI.
+
 ## 5. Limits
 
 - No WebSocket or Server-Sent Events.

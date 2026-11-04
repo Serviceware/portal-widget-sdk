@@ -1,0 +1,22 @@
+{
+  "name": "@examples/service-connection-auth-modes",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "version": "1.0.0",
+  "description": "Six test widgets, one per Service Connection security mode, plus a local test API that checks what the Portal proxy sends.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && node build.mjs",
+    "pack:widgets": "node pack.mjs",
+    "upstream": "node upstream.mjs",
+    "e2e": "node e2e.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@serviceware-oss/portal-widget-cli": "link:../../packages/cli",
+    "@serviceware-oss/portal-widget-sdk": "link:../../packages/sdk",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.6.0"
+  }
+}
