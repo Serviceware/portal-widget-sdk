@@ -114,6 +114,11 @@ Needed for Tier 1. Minimal design that fits the existing gateway:
 
 Until this exists, SDK docs state plainly that private API keys cannot be used securely from a widget.
 
+**Status:** addressed by Portal 3 with the Service Connection proxy, together with the §2 masking,
+encryption at rest, page authorisation, opt-in anonymous use and an SSRF guard. Contract:
+[contract.md](contract.md) §5a; SDK: `ctx.service` / `createServiceClient`. See
+[service-connection-proxy.md](service-connection-proxy.md). §1 and §2 describe Portals without it.
+
 ---
 
 ## 5. Portal-side backlog items resulting from this analysis

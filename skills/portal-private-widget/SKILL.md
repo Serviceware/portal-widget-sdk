@@ -30,6 +30,7 @@ steps differ:
 | `dependencies` in `portal-widget.json` | `>=3.0.0` | `>=2.0.0` | `>=2.0.0` |
 | Import (section 8) | no feature flag | `private-widgets` feature flag | both |
 | Settings entry point for admins | page configuration panel | the tile's ⋮ menu → widget settings | both |
+| Third-party credentials via `ctx.service()` (section 6) | Portal in the cloud only today; not on-premise 3.0 | no | no |
 
 Why shadow on Portal 2: Portal 2 doesn't stamp the `[<tag>]` attribute on its widget wrapper, so light-mode
 CSS (scoped to `[<tag>]`) matches nothing there and the tile renders unstyled. Portal 2 also has no compliance
@@ -284,6 +285,7 @@ What `ctx` offers:
 | Open the settings dialog | `ctx.openSettings()`; show the trigger only if `showSettingsButton` |
 | Toasts | `ctx.toast.success / info / warning / error(detail, summary?)` |
 | Portal API as the current user | `ctx.fetch(`${ctx.inputs.apiUrl}/…`)`: bearer token only for `apiUrl` URLs |
+| Third-party API with a credential | `ctx.service(connectionId)(path)` through a linked Service Connection (section 6); `ctx.serviceConnections()` lists the linked ones |
 | Uploaded translations | `await ctx.loadTranslations(ctx.inputs.language)` |
 | Grid resize | `ctx.onResize(({ width, height }) => …)` |
 | Navigation, skeleton | `navigate(route, query?)`, `showSkeleton(id)`, `hideSkeleton(id)` from the package root |
@@ -312,7 +314,8 @@ compliance probe requires.
 - Style only classes you own, never `html`/`body`/`:root`. No runtime CSS-in-JS. Don't append elements to
   `document.body`.
 - Shadow mode (`node build.mjs --shadow`) isolates fully, but on Portal 3 the probe logs a warning today.
-  Use it for Portal 2 or "both" (section 1), or if the user asks.
+  Use it for Portal 2 or "both" (section 1), or if the user asks. Which SDK version runs on which Portal:
+  [`docs/compatibility.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/compatibility.md).
 - For shadow mode, change the `build` script to `tsc --noEmit && node build.mjs --shadow`. `styles.css` then
   stays unscoped inside the shadow root, `:host` styles the element, and at-rules such as `@media` are allowed.
 - Portal 2 has unlayered global styles: in light mode they would win over `@layer widgets`. Another reason
@@ -325,10 +328,28 @@ compliance probe requires.
   `SecretInConfigError` if they are non-empty.
 - `authToken` is the user's Portal session. Only send it to `apiUrl` (via `ctx.fetch`); never forward or
   store it.
-- **No secure way exists today to call a third-party API with a private key** (there's no Service Connection
-  proxy yet). Tell the user plainly. The options are a key that is public by design and referrer-restricted
-  (can go in `customConfig`, documented as public), or their own backend that holds the key and validates the
-  forwarded Portal token.
+- **Private keys go into a Portal Service Connection, never into the widget** — not into `customConfig`, not
+  into a `secret: true` field, not into the bundle. Needs Portal 3 with the Service Connection proxy: today the
+  Portal in the cloud has it, on-premise 3.0 and 2.3 do not ([`docs/compatibility.md`](https://github.com/Serviceware/portal-widget-sdk/blob/main/docs/compatibility.md)); ask the user which Portal
+  the widget targets. If it has the proxy:
+  - The admin creates the connection (base URL + mode: `Custom` = API key header or query parameter,
+    `BearerToken`, `Basic`, `OAuth2ClientCredentials`, `ForwardUserToken` = the user's Portal token) and
+    links it to the widget instance in the widget settings.
+  - The widget's settings view lists candidates via `ctx.fetch('api/v2/admin/serviceconnections')` (admin
+    only) and saves with `ctx.save(customConfig, { serviceConnectionsId: [id] })`; `customConfig` holds only
+    the connection id.
+  - The widget calls `await ctx.service(id)(path, init)` (path relative to the connection URL). The
+    `Response` comes back unchanged: handle non-2xx (`401`, `404`, `429` + `Retry-After`, `502`, `504`, or
+    upstream statuses) with a neutral message; never retry in a loop. `ServiceConnectionNotFoundError` means
+    nothing is linked yet: tell the admin to link it in the settings.
+  - `ctx.serviceConnections()` gives `{ id, name, module, mode, modeName, isDefault, hasCredentials,
+    allowAnonymous, url }` without any secret. Never read or display `configuration.serviceConnections[].security`
+    values: it is the stored JSON string, and while the admin keeps *Give credentials to widgets* on
+    (`exposeCredentials`, the default for connections from before the proxy) it holds the real credentials.
+  - On anonymous pages it works only for connections the admin marked *allow anonymous*.
+  Without the proxy, tell the user plainly there is no secure browser-side option: use a key that is public by
+  design and referrer-restricted (can go in `customConfig`, documented as public), or their own backend that
+  holds the key and validates the forwarded Portal token.
 - No `.env` files, no source maps, bundles < 10 MB.
 
 ## 7. Build, validate, pack

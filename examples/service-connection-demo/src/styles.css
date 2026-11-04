@@ -1,0 +1,73 @@
+/* Flat on purpose: build.mjs scopes every selector to [service-connection-demo] in light mode. */
+:host {
+    display: block;
+    height: 100%;
+    font: 14px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: #1f2933;
+}
+.card {
+    display: grid;
+    gap: 8px;
+    height: 100%;
+    padding: 12px 14px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+h3 {
+    margin: 0;
+    font-size: 15px;
+}
+h4 {
+    margin: 4px 0 0;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7a88;
+}
+.muted {
+    margin: 0;
+    font-size: 12px;
+    color: #6b7a88;
+}
+label {
+    display: grid;
+    gap: 4px;
+    font-size: 12px;
+}
+select, input {
+    padding: 4px 6px;
+    border: 1px solid #cfd8e3;
+    border-radius: 4px;
+    font: inherit;
+}
+button {
+    justify-self: start;
+    padding: 5px 12px;
+    border: 1px solid #0082bb;
+    border-radius: 4px;
+    background: #fff;
+    color: #0082bb;
+    font: inherit;
+    cursor: pointer;
+}
+button.primary {
+    background: #0082bb;
+    color: #fff;
+}
+button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+.actions {
+    display: flex;
+    gap: 8px;
+}
+pre {
+    margin: 0;
+    padding: 8px;
+    border-radius: 6px;
+    background: #f3f6f9;
+    font: 12px/1.45 ui-monospace, Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

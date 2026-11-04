@@ -112,3 +112,42 @@ export function isValidPrivateWidgetTag(tag: string): boolean {
 
 /** Environment variable prefix the CLI is allowed to inline into bundles. */
 export const PUBLIC_ENV_PREFIX = 'PORTAL_WIDGET_PUBLIC_' as const;
+
+/**
+ * Service Connection proxy (docs/contract.md section 5a). Needs Portal 3 with the Service Connection
+ * proxy. The Portal adds the connection's credentials server-side.
+ */
+export const SERVICE_PROXY_PATH = 'api/v1/proxy' as const;
+
+/** Status codes the proxy itself answers with (`application/problem+json`). Upstream statuses pass through. */
+export const SERVICE_PROXY_STATUS = {
+    /** Missing or invalid instance header, or a path that escapes the connection URL. */
+    badRequest: 400,
+    /** A Portal token was sent but is invalid. */
+    unauthorized: 401,
+    /** Connection unknown, not linked to the instance, or not allowed for this caller. */
+    notFound: 404,
+    /** Anonymous rate limit hit; honour `Retry-After`. */
+    tooManyRequests: 429,
+    /** Upstream unreachable, blocked or response too large. */
+    badGateway: 502,
+    /** Upstream did not answer in time. */
+    gatewayTimeout: 504
+} as const;
+
+/** Limits the proxy enforces. */
+export const SERVICE_PROXY_LIMITS = {
+    timeoutMs: 30_000,
+    maxBodyBytes: 10 * 1024 * 1024
+} as const;
+
+/** What the Portal returns instead of every stored secret value. */
+export const MASKED_SECRET_VALUE = '********' as const;
+
+/** Header carrying the route-widget instance id; the connection must be linked to that instance. */
+export const WIDGET_INSTANCE_HEADER = 'X-Portal-Widget-Instance' as const;
+
+/** Path relative to `apiUrl`: `api/v1/proxy/{connectionId}/{path}`. */
+export function serviceProxyPath(connectionId: string, path = ''): string {
+    return `${SERVICE_PROXY_PATH}/${encodeURIComponent(connectionId)}/${path.replace(/^\/+/, '')}`;
+}

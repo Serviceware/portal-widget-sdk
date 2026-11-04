@@ -25,9 +25,10 @@ by `.github/workflows/release.yml`.
 Widgets built with this SDK are uploaded through **Portal Admin → Widgets → Add private widget**, either
 field by field or by importing the zip the CLI produces.
 
-> **Known limitation:** a widget currently has **no secure way to authenticate against a third-party API**
-> with a private key. Only calls to the Portal API as the current user are supported. The Portal-side
-> proxy for Service Connections does not exist yet; see [packages/sdk/README.md](packages/sdk/README.md)
+> **Third-party credentials:** a widget never holds a private API key. On Portal 3 with the Service
+> Connection proxy, the admin stores the credential in a Service Connection and the widget calls
+> `ctx.service(name)(path)`; the Portal adds the credential server-side. Without the proxy, only calls to the
+> Portal API as the current user are supported. See [docs/service-connection-proxy.md](docs/service-connection-proxy.md)
 > and [docs/security.md](docs/security.md).
 
 ## Agent skill
@@ -69,6 +70,8 @@ slash command without copying it.
 
 0. [docs/getting-started.md](docs/getting-started.md) – build, test, pack and import your first widget, with
    any framework. Start here if you want to write a widget rather than work on the SDK.
+   [docs/compatibility.md](docs/compatibility.md) – which SDK version runs on which Portal version (on-premise
+   2.3 and 3.0, cloud).
 1. [docs/contract.md](docs/contract.md) – the exact Portal ↔ widget contract (events, element I/O, bundle
    loading, light vs full, zip format). **Single source of truth for both packages.**
 2. [docs/security.md](docs/security.md) – threat model, where secrets may and may not live, guardrails.

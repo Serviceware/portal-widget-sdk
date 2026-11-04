@@ -15,10 +15,10 @@ importers:
         specifier: ^19.2.0
         version: 19.3.0(react@19.3.0)
     devDependencies:
-      '@serviceware/portal-widget-cli':
+      '@serviceware-oss/portal-widget-cli':
         specifier: link:../../packages/cli
         version: link:../../packages/cli
-      '@serviceware/portal-widget-sdk':
+      '@serviceware-oss/portal-widget-sdk':
         specifier: link:../../packages/sdk
         version: link:../../packages/sdk
       '@types/react':

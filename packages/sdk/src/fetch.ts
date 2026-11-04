@@ -43,10 +43,9 @@ function resolveUrl(input: string, base: URL | null): string {
  * against `apiUrl`; an already present `Authorization` header is left untouched.
  *
  * This authenticates the current user against the Portal API and nothing else.
- * There is currently no secure way for a widget to call a third-party API with a
- * private key: the browser exposes everything, and the Portal has no server-side
- * proxy for Service Connections yet. Keep private keys in a backend you control.
- * See the package README, first section.
+ * Never put a private key into the browser. To call a third-party API with a
+ * credential, use `createServiceClient` (service-client.ts): the Portal holds the
+ * credential in a Service Connection and adds it server-side.
  */
 export function createPortalFetch(getAuth: () => PortalAuth): typeof fetch {
     return (input, init) => {
