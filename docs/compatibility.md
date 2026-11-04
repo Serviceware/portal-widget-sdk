@@ -11,11 +11,21 @@ can be missing on an older on-premise Portal. The rest of the SDK keeps working 
 
 | SDK / CLI | Portal 2.3 (on-premise, 2.3.0–2.3.4) | Portal 3.0 (on-premise, 3.0.x) | Portal 3 in the cloud (latest) |
 |---|---|---|---|
-| **0.2.0** (next) | ✅ with `cssMode: 'shadow'` · ❌ `ctx.service()` | ✅ · ❌ `ctx.service()` | ✅ everything |
-| **0.1.1** | ✅ with `cssMode: 'shadow'` | ✅ | ✅ |
-| **0.1.0** | ✅ with `cssMode: 'shadow'` | ✅ | ✅ |
+| **0.2.0** (next) | ✅ with `cssMode: 'shadow'`¹ · ❌ `ctx.service()` | ✅ · ❌ `ctx.service()` | ✅ everything |
+| **0.1.1** | ✅ with `cssMode: 'shadow'`¹ | ✅ | ✅ |
+| **0.1.0** | ✅ with `cssMode: 'shadow'`¹ | ✅ | ✅ |
 
 0.1.1 changed only the release pipeline; its runtime is the same as 0.1.0.
+
+¹ Portal 2.3 also needs the `private-widgets` feature flag for the tenant, or the admin cannot upload a private
+widget. An on-premise 2.3 Portal has no admin UI for feature flags: the operator adds the flag `private-widgets`
+for the website in the Portal database (table `featureflags`). Portal 3.0 and later enable private widgets for
+every tenant.
+
+**Portal 2 tenants in the cloud** run the Portal 2 frontend against the cloud backend: like Portal 2.3 they need
+`cssMode: 'shadow'` and the `private-widgets` flag; the Service Connection proxy is there on the server, but
+`ctx.service()` from a Portal 2 page is not verified. Differences between Portal 2 and 3 in detail:
+[contract.md section 11](contract.md#11-portal-2x).
 
 ## Per feature
 
@@ -23,7 +33,7 @@ can be missing on an older on-premise Portal. The rest of the SDK keeps working 
 |---|---|---|---|---|
 | Custom element, inputs (`configuration`, `authToken`, `apiUrl`, `settingsMode`, `isAdminMode`, `language`), settings save/cancel, toasts, navigate, skeleton, resize | 0.1.0 | ✅ | ✅ | ✅ |
 | `ctx.fetch` to the Portal API with the user's token | 0.1.0 | ✅ | ✅ | ✅ |
-| Private widget upload and ZIP import (`portal-widget pack`) | 0.1.0 | ✅ | ✅ | ✅ |
+| Private widget upload and ZIP import (`portal-widget pack`) | 0.1.0 | ✅ with the `private-widgets` flag¹ | ✅ | ✅ |
 | `cssMode: 'shadow'` (styles in the shadow root) | 0.1.0 | ✅ | ✅ | ✅ |
 | `cssMode: 'light'` (styles scoped to `[<tag>]` in `@layer widgets`) | 0.1.0 | ❌ styles do not apply: the Portal does not mark the widget host with `[<tag>]` and has no `widgets` layer | ✅ | ✅ |
 | `ctx.serviceConnections()` (linked connections, no secrets) and linking with `ctx.save(config, { serviceConnectionsId })` | 0.2.0 | ✅ | ✅ | ✅ |
@@ -42,7 +52,7 @@ accepts the widget anyway.
 On 2026-11-04 against the Portal sources of the 2.3 line (release 2.3.4 and its servicing branch), the 3.0 line
 (release 3.0.0 and its servicing branch) and the current cloud release: event names and `SSPEvent` suffix,
 element inputs and outputs, the bundle URL and the full/light choice (`angularVersion: 0` always loads the full
-bundle), the private widget upload and ZIP import, the widget host attribute and the CSS layer order, the
+bundle), the private widget upload and ZIP import and its feature flag, the widget host attribute and the CSS layer order, the
 connection link on route widgets, and the Service Connection proxy. All six proxy security modes were run end to
 end against a local Portal built from the current cloud release, with `examples/service-connection-auth-modes`
 (`pnpm e2e`). The contract

@@ -10,7 +10,9 @@ repeating them. The complete worked example is
 ## 1. What you need
 
 - Node 20 or newer and a package manager (npm, pnpm or yarn).
-- A Portal 3.x with the `private-widgets` feature flag enabled and an administrator account.
+- A Portal 3.x and an administrator account. Private widgets are enabled for every tenant; early Portal
+  3.x releases and Portal 2.x still need the `private-widgets` feature flag. Portal 2 also needs shadow-mode
+  CSS: see [contract.md section 11](contract.md#11-portal-2x).
 - The two packages from npm: `@serviceware-oss/portal-widget-sdk` (runtime, a regular dependency of your widget)
   and `@serviceware-oss/portal-widget-cli` (a dev dependency, or run ad hoc with `npx`). Inside this repository
   the examples link to the local packages (`link:../../packages/*`) and each is its own pnpm project: run
@@ -159,7 +161,8 @@ npx portal-widget pack                             # -> <tagName>.zip
 
 Import: Portal Administration, Configuration, Widgets tab (`admin/configuration?tab=4`), the **small arrow**
 next to "Add private widget", Import, pick the zip, Upload. Navigate to Home first and then to
-Configuration; deep-linking hides the button because of a feature-flag caching bug in the Portal.
+Configuration; on Portals that still gate private widgets behind the feature flag, deep-linking hides the
+button because of a feature-flag caching bug.
 
 Then place the widget on a page, open the browser console and confirm there is **no `[Widget Compliance]`
 warning**. The per-widget settings gear is in the page configuration panel, not on the tile.

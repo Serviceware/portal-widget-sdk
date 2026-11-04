@@ -55,3 +55,21 @@ Details and conclusions in [backend-findings.md](backend-findings.md).
 | Translation resolution (private path ignores version, base-language fallback) | `business/Storage.Domain/Language/GetLanguageForWidgetQueryHandler.cs` |
 | Storage endpoints anonymous | `hosting/Storage.Api/Controllers/StorageController.cs:135-258` |
 | Default connections have no headers | `data/Portal.Migration/Service/DefaultServiceConnectionsMigratorService.cs:18` |
+
+## Portal 2.x
+
+Frontend repository branch `main` at `ba69dab8` (Portal 2), compared with `portal30` at `c3c96c64`.
+Backend branch `main` at `070d7a40` (shared by Portal 2 and Portal 3 tenants). Paths as in the tables above.
+
+| Fact | Source |
+|---|---|
+| Same element bindings, no host attribute stamping, no compliance call, no dev-widgets override, `hidden` binding | `libs/common/src/lib/page/containers/widget/widget.component.html:6-31`, `widget.component.ts:102-115` on `main`; compare `widget.component.ts:120-136` on `portal30` |
+| Portal's own tile menu (settings, copy, details) | `libs/common/src/lib/page/containers/widget/widget.component.html:52-63`, `widget.component.ts:218-235` on `main` |
+| Light/full pick against Angular major 21 | `libs/common/src/lib/page/containers/widget/utils/widget-utils.ts:14-16`, `package.json` (`@angular/core` 21.x) on `main` |
+| Only `@layer codeblue`, other Portal CSS unlayered | `libs/common/src/lib/assets/styles/styles.scss:9` on `main` |
+| Event names, payload classes, toast and config-modal handlers unchanged | `libs/utils/src/lib/models/enums/events.enum.ts`, `libs/utils/src/lib/models/events/`, `apps/admin/src/app/app.component.ts` (`subscribeToShowConfigModal`, `listenToastEvent`) on `main` (no diff to `portal30`) |
+| `private-widgets` feature flag gate, Import split button, route | `libs/admin/src/lib/widgets-management/components/widgets-management-overview/widgets-management-overview.component.ts:67,122`, `.component.html:29-37`, `libs/common/src/lib/core/models/routes/admin-routes.enum.ts:6` on `main` |
+| Upload dialog unchanged | `libs/admin/src/lib/widgets-management/components/upload-widget-dialog/upload-widget-dialog.component.ts` (only formatting and change detection differ) |
+| Private widgets stored without a Portal version | backend `business/Portal.Domain/Widget/Commands/AddPrivateWidget/AddPrivateWidgetCommandHandler.cs:119` |
+| Empty Portal version is compatible with every tenant | backend `utils/Portal.Utils/Helper/PortalVersionHelper.cs:22-26`; used in `business/Portal.Domain/Widget/Queries/GetAll/GetWidgetsQueryHandler.cs:247` |
+| Private widget endpoints, no Portal version field | backend `hosting/Portal.Api/Controllers/WidgetController.cs:249,299`, `business/Portal.Domain/Widget/Commands/AddPrivateWidget/AddPrivateWidgetCommand.cs` |
